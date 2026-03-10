@@ -1,0 +1,17 @@
+:root {
+  /* Paleta Kura */
+  --kura-bg: #0f0f0f;
+  --kura-surface: #1a1a1a;
+  --kura-primary: #e63946; 
+  --kura-text: #f1faee;
+  --kura-text-secondary: #a8dadc;
+  
+  /* Tipografía */
+  --font-main: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background: var(--kura-bg);
+  color: var(--kura-text);
+  font-family: var(--font-main);
+}
