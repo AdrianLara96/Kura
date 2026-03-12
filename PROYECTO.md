@@ -1,18 +1,18 @@
-## Proyecto Futuro: CulturaViva
+## Proyecto : Kura
 
 ---
 
-**Estado:** En planificación para iniciar cuando el tiempo lo permita
+**Estado:** Proyecto iniciado
 
 **Concepto:** Plataforma de descubrimiento cultural que conecta obras maestras de museos internacionales con colecciones temáticas creadas por usuarios.
 
 ---
 
-### 📋 Información del Proyecto
+### Información del Proyecto
 
 | Campo                 | Valor                                     |
 | --------------------- | ----------------------------------------- |
-| **Nombre**            | CulturaViva                               |
+| **Nombre**            | Kura                                      |
 | **Tipo**              | Plataforma web de descubrimiento cultural |
 | **Stack**             | Vue 3 + Vite + JavaScript + Supabase      |
 | **Duración estimada** | 8 semanas (MVP de 4 fases)                |
@@ -20,7 +20,7 @@
 
 ---
 
-### 🗺️ Roadmap del MVP (4 Fases)
+### Roadmap del MVP (4 Fases)
 
 | Fase           | Duración  | Objetivo                                |
 | -------------- | --------- | --------------------------------------- |
@@ -31,7 +31,7 @@
 
 ---
 
-### 🗄️ Esquema de Base de Datos
+### Esquema de Base de Datos
 
 #### Tabla: user_profiles
 
@@ -138,7 +138,7 @@
 
 ---
 
-### 🔐 Políticas RLS Principales
+### Políticas RLS Principales
 
 | Tabla                  | Operación            | Condición                                |
 | ---------------------- | -------------------- | ---------------------------------------- |
@@ -155,7 +155,7 @@
 
 ---
 
-### 🗺️ Estructura de Rutas
+### Estructura de Rutas
 
 #### Rutas Públicas
 
@@ -185,7 +185,7 @@
 
 ---
 
-### 📁 Estructura de Carpetas
+### Estructura de Carpetas
 
 src/
 ├── services/
@@ -221,7 +221,7 @@ src/
 
 ---
 
-### 🔐 Variables de Entorno
+### Variables de Entorno
 
 **Supabase**
 VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
@@ -232,9 +232,10 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 ---
 
-### 🎨 Features por Fase
+### Features por Fase
 
 #### Fase 1: Foundation
+
 - Auth completo (login, registro, logout)
 - Perfiles de usuario editables
 - Integración API Rijksmuseum
@@ -242,12 +243,14 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 - Router protegido
 
 **Criterio de completado:**
-- [ ] Usuario puede registrarse/loguearse
-- [ ] Usuario puede editar su perfil
+
+- [X] Usuario puede registrarse/loguearse
+- [X] Usuario puede editar su perfil
 - [ ] Se pueden fetchear obras del Rijksmuseum
 - [ ] Las obras se guardan en cache en tu BD
 
 #### Fase 2: Exploración
+
 - Grid de obras responsive
 - Filtros por museo, período, artista
 - Búsqueda por texto
@@ -256,12 +259,14 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 - Home con destacados
 
 **Criterio de completado:**
+
 - [ ] Grid de obras responsive
 - [ ] Filtros funcionan correctamente
 - [ ] Detalle de obra muestra toda la información
 - [ ] Home muestra obras destacadas del día
 
 #### Fase 3: Colecciones
+
 - Crear colección (título, descripción, portada)
 - Añadir obras desde explorador
 - Ver colección propia y pública
@@ -269,12 +274,14 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 - Galería de colecciones públicas
 
 **Criterio de completado:**
+
 - [ ] Crear colección con título y descripción
 - [ ] Añadir obras desde el explorador
 - [ ] Ver colección propia y pública
 - [ ] Editar/eliminar colecciones propias
 
 #### Fase 4: Comunidad
+
 - Likes en colecciones
 - Comentarios en colecciones
 - Seguir usuarios
@@ -282,6 +289,7 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 - Notificaciones básicas
 
 **Criterio de completado:**
+
 - [ ] Dar like a colecciones
 - [ ] Comentar en colecciones
 - [ ] Seguir/dejar de seguir usuarios
@@ -289,32 +297,32 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 ---
 
-### 🚀 Features Futuras (Post-MVP)
+### Features Futuras (Post-MVP)
 
-| Feature | Complejidad |
-|---------|-------------|
-| Más museos (Met, Prado, V&A) | Baja |
-| Artistas emergentes (upload obras) | Media |
-| "Inspirado por" (vincular clásico-contemporáneo) | Media |
-| Rutas de aprendizaje | Media |
-| Time Travel Slider | Alta |
-| Extracción de colores | Media |
-| Mapa mundial | Media |
-| Eventos virtuales | Media |
-| NFT Marketplace | Alta |
-| AI Art Historian (chatbot) | Alta |
+| Feature                                          | Complejidad |
+| ------------------------------------------------ | ----------- |
+| Más museos (Met, Prado, V&A)                     | Baja        |
+| Artistas emergentes (upload obras)               | Media       |
+| "Inspirado por" (vincular clásico-contemporáneo) | Media       |
+| Rutas de aprendizaje                             | Media       |
+| Time Travel Slider                               | Alta        |
+| Extracción de colores                            | Media       |
+| Mapa mundial                                     | Media       |
+| Eventos virtuales                                | Media       |
+| NFT Marketplace                                  | Alta        |
+| AI Art Historian (chatbot)                       | Alta        |
 
 ---
 
-### 🔗 Enlaces de Referencia
+### Enlaces de Referencia
 
-| Recurso | URL |
-|---------|-----|
-| Documentación Vue 3 | https://vuejs.org/ |
-| Documentación Supabase | https://supabase.com/docs |
-| Rijksmuseum API | https://data.rijksmuseum.nl/object-metadata/api/ |
-| The Met API | https://metmuseum.github.io/ |
-| Museo del Prado API | https://www.museodelprado.es/api/ |
+| Recurso                | URL                                              |
+| ---------------------- | ------------------------------------------------ |
+| Documentación Vue 3    | https://vuejs.org/                               |
+| Documentación Supabase | https://supabase.com/docs                        |
+| Rijksmuseum API        | https://data.rijksmuseum.nl/object-metadata/api/ |
+| The Met API            | https://metmuseum.github.io/                     |
+| Museo del Prado API    | https://www.museodelprado.es/api/                |
 
 ---
 
@@ -329,14 +337,12 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 ---
 
-### **Documento creado:** 04/03/2026*
-
----
+### **Documento creado:** 04/03/2026\*
 
 
 ---
 
-# 📓 Bitácora de Desarrollo - Kura
+# Bitácora de Desarrollo - Kura
 
 Registro de todos los pasos, decisiones y cambios del proyecto.
 
@@ -344,9 +350,9 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ## [2026-03-04] Paso 1: Setup Inicial del Proyecto
 
-### ✅ Completado
+### Completado
 
-- [x] Nombre del proyecto: **Kura** (antes CulturaViva)
+- [x] Nombre del proyecto: **Kura**
 - [x] Crear proyecto con Vite + Vue 3
 - [x] Instalar dependencias base (vue-router, pinia, supabase-js, axios)
 - [x] Crear estructura de carpetas
@@ -359,11 +365,11 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
   - `src/services/syncService.js`
 - [x] Primer commit realizado
 
-### 📝 Notas
+### Notas
 
 - Estructura de carpetas alineada con roadmap de 4 fases
 
-### 🔜 Siguiente Paso
+### Siguiente Paso
 
 - Configurar proyecto en Supabase (tablas + RLS)
 
@@ -371,30 +377,16 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ## [Fecha] Paso 2: [Título]
 
-### ✅ Completado
+### Completado
 
-- [ ] 
+- [ ]
 
-### 📝 Notas
+### Notas
 
-- 
+-
 
-### 🔜 Siguiente Paso
+### Siguiente Paso
 
-- 
+-
 
 ---
-
-## [Fecha] Paso 3: [Título]
-
-### ✅ Completado
-
-- [ ] 
-
-### 📝 Notas
-
-- 
-
-### 🔜 Siguiente Paso
-
-- 

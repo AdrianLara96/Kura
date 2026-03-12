@@ -1,0 +1,1 @@
+<template><div class="p-4"><h1>🖼️ Detalle de obra</h1><p>Próximamente</p></div></template>

@@ -1,0 +1,1 @@
+<template><div class="p-4"><h1>🔍 Explorar</h1><p>Próximamente: grid de obras</p></div></template>
