@@ -1,6 +1,7 @@
-<!-- src/views/profile/ProfileEdit.vue -->
 <template>
-  <div class="profile-edit">
+  <TopNav />   
+  <div class="profile-edit">   
+
     <h1>✏️ Editar Perfil</h1>
     
     <!-- Avatar Section -->
@@ -104,8 +105,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import TopNav from '@/components/common/TopNav.vue'
 
-const { user, fetchProfile, updateProfile, uploadProfileAvatar, getDefaultAvatar } = useAuth()
+const { user, signOut, fetchProfile, updateProfile, uploadProfileAvatar, getDefaultAvatar } = useAuth()
 const router = useRouter()
 
 // Estado del formulario
@@ -130,6 +132,10 @@ const avatarError = ref(null)
 const defaultAvatarUrl = computed(() => 
   getDefaultAvatar(profile.value?.display_name || form.value.display_name)
 )
+
+const handleLogout = async () => {
+  await signOut()
+}
 
 // Cargar perfil al montar
 onMounted(async () => {
@@ -225,12 +231,57 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-/* Estilos mínimos funcionales - sin diseño, solo estructura */
 .profile-edit {
   max-width: 600px;
-  margin: 2rem auto;
+  margin: 0 auto;
   padding: 1rem;
   font-family: system-ui, sans-serif;
+}
+
+/* Navegación */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Botones de acción rápida */
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: #e0e0e0;
+  color: #333;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #bdbdbd;
+}
+
+.btn-outline {
+  padding: 0.5rem 1rem;
+  border: 1px solid #1976d2;
+  color: #1976d2;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline:hover {
+  background: #1976d2;
+  color: white;
 }
 
 .avatar-section {

@@ -1,4 +1,5 @@
 <template>
+  <TopNav />   
   <div class="p-4">
     <h1>👋 Hola, {{ user?.email }}</h1>
     <p>Bienvenido a tu dashboard de Kura</p>
@@ -10,6 +11,8 @@
 
 <script setup>
 import { useAuth } from '@/composables/useAuth'
+import TopNav from '../../components/common/TopNav.vue'
+
 const { user, signOut } = useAuth()
 
 const handleLogout = async () => {

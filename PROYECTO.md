@@ -238,7 +238,7 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 - Auth completo (login, registro, logout)
 - Perfiles de usuario editables
-- Integración API Rijksmuseum
+- Integración API 
 - Sincronización con cache (7 días)
 - Router protegido
 
@@ -246,8 +246,8 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 - [X] Usuario puede registrarse/loguearse
 - [X] Usuario puede editar su perfil
-- [ ] Se pueden fetchear obras del Rijksmuseum
-- [ ] Las obras se guardan en cache en tu BD
+- [ ] Se pueden fetchear obras
+- [X] Las obras se guardan en cache en tu BD
 
 #### Fase 2: Exploración
 
@@ -375,18 +375,31 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ---
 
-## [Fecha] Paso 2: [Título]
+## [2026-03-12] ✅ FASE 1: FOUNDATION - COMPLETADA
 
-### Completado
+### Logros técnicos
+- [x] Auth con Supabase + Vue 3 (login, registro, logout, sesiones)
+- [x] Perfiles editables + Storage para avatares + RLS policies
+- [x] BD: user_profiles + museum_artworks con índices + caché TTL
+- [x] Integración API: museumApi.js + syncService.js + useArtworks.js
+- [x] Mock data con 5 obras reales del Met (URLs verificadas)
+- [x] Router protegido con guards para rutas públicas/privadas
+- [x] UI base: Home, Explore, Detail, Profile, Dashboard funcionales
+- [x] Navegación global: TopNav componente reutilizable
+- [x] Estado de auth reactivo en toda la app (login/logout condicional)
 
-- [ ]
+### URLs verificadas (imágenes reales del Met)
+- DP-42549-001.jpg (Van Gogh - Wheat Field with Cypresses)
+- DP346475.jpg (Van Gogh - Roses)
+- DP164788.jpg (Dürer - Virgin and Child)
+- DP158156.jpg (Gatti - Translation of Loreto)
+- DP349564.jpg (El Greco - View of Toledo)
 
-### Notas
-
--
-
-### Siguiente Paso
-
--
+### Próximo: Fase 2 - Exploración avanzada
+- Grid responsive con lazy loading de imágenes
+- Filtros combinados: museo + período + artista + tags
+- Búsqueda full-text con índice GIN en PostgreSQL
+- Infinite scroll / paginación optimizada
+- Home con obras destacadas curadas
 
 ---

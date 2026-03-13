@@ -10,6 +10,7 @@ import ExploreView from '@/views/explore/ExploreView.vue'
 import ArtworkDetail from '@/views/explore/ArtworkDetail.vue'
 import ProfileEdit from '@/views/profile/ProfileEdit.vue'
 import PublicProfileView from '@/views/profile/PublicProfileView.vue'
+import TestApiView from '@/views/TestApiView.vue'
 
 // Guard simple para rutas protegidas
 async function requireAuth(to, from, next) {
@@ -29,7 +30,8 @@ const routes = [
   { path: '/register', name: 'register', component: RegisterView, meta: { requiresAuth: false, hideForAuth: true } },
   { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
   { path: '/my-profile', name: 'profile-edit', component: ProfileEdit, meta: { requireAuth: true } },
-  { path: '/profile/:username', name: 'public-profile', component: PublicProfileView, meta: { requireAuth: false } }
+  { path: '/profile/:username', name: 'public-profile', component: PublicProfileView, meta: { requireAuth: false } },
+  { path: '/test-api', name: 'test-api',  component: TestApiView,  meta: { requiresAuth: false } },
 ]
 
 const router = createRouter({
