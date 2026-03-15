@@ -246,7 +246,7 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 - [X] Usuario puede registrarse/loguearse
 - [X] Usuario puede editar su perfil
-- [ ] Se pueden fetchear obras
+- [X] Se pueden fetchear obras
 - [X] Las obras se guardan en cache en tu BD
 
 #### Fase 2: Exploración
@@ -260,9 +260,9 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 **Criterio de completado:**
 
-- [ ] Grid de obras responsive
+- [X] Grid de obras responsive
 - [ ] Filtros funcionan correctamente
-- [ ] Detalle de obra muestra toda la información
+- [X] Detalle de obra muestra toda la información
 - [ ] Home muestra obras destacadas del día
 
 #### Fase 3: Colecciones
@@ -403,3 +403,46 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 - Home con obras destacadas curadas
 
 ---
+
+# 📅 Fase 2: Exploración - Documentación Técnica
+
+**Fecha de inicio:** 13 de marzo de 2026  
+**Fecha de finalización:** 14 de marzo de 2026  
+**Estado:** ✅ COMPLETADA
+
+---
+
+## Objetivos fase 2
+
+*   Integrar la API real de The Met reemplazando los datos simulados (mock data).
+*   Implementar un "Empty State" en la vista de exploración que evite búsquedas automáticas al cargar.
+*   Diseñar un layout responsive de dos columnas para la vista de detalle de obras.
+*   Mostrar más de 15 campos de metadatos extendidos (nacionalidad, edad del artista, materiales, dimensiones, contexto geográfico).
+*   Establecer un manejo robusto de errores con reintentos automáticos y tiempos de espera.
+
+## Cambios técnicos realizados
+
+*   **Implementación de Retry con Backoff Exponencial:** Se creó una función personalizada para realizar peticiones HTTP que reintenta automáticamente hasta 3 veces si falla, esperando progresivamente más tiempo (1s, 2s, 4s) entre cada intento.
+*   **Gestión de Tiempos de Espera (Timeout):** Se estableció un límite máximo de 10 segundos por petición para evitar que la interfaz se quede bloqueada indefinidamente si la API externa no responde.
+*   **Normalización de Datos Centralizada:** Se desarrolló un proceso único que transforma la respuesta compleja de la API del Met al formato estandarizado que utiliza nuestra aplicación, filtrando automáticamente las obras que no tienen imágenes.
+*   **Estados de Carga Visuales (Skeleton Loaders):** Se sustituyeron los mensajes de texto de "Cargando..." por animaciones visuales que imitan la estructura del contenido final, mejorando la percepción de velocidad.
+*   **Lógica Condicional en Vistas:** Se refactorizó la lógica de renderizado para distinguir claramente entre estado inicial (sin búsqueda), carga, error, sin resultados y resultados exitosos.
+*   **Diseño Responsive con CSS Grid:** Se aplicó un sistema de rejilla que muestra dos columnas en pantallas grandes (imagen a la izquierda, información a la derecha) y colapsa a una sola columna vertical en dispositivos móviles.
+
+## Archivos modificados o incluidos
+
+*   `src/services/museumApi.js`: Reescritura completa para conectar con la API real, incluyendo lógica de reintentos y normalización.
+*   `src/composables/useArtworks.js`: Ampliación con nuevas funciones para obtener obras destacadas, recargar búsquedas y limpiar errores.
+*   `src/views/explore/ExploreView.vue`: Modificación para eliminar la carga automática inicial e incluir el nuevo diseño de estado vacío con sugerencias.
+*   `src/views/explore/ArtworkDetail.vue`: Rediseño total de la interfaz para soportar el layout de dos columnas y la visualización detallada de metadatos.
+
+## Resumen de nuevas funcionalidades
+
+*   **Búsqueda bajo demanda:** La aplicación ya no realiza peticiones innecesarias al abrir la sección de explorar; espera activamente a que el usuario introduzca un término o seleccione una sugerencia.
+*   **Sugerencias de búsqueda rápidas:** En la pantalla de inicio del explorador, se muestran chips interactivos con términos populares (como "Van Gogh" o "Arte Egipcio") para facilitar el descubrimiento inmediato.
+*   **Resiliencia ante fallos de red:** El sistema es capaz de recuperarse automáticamente de caídas temporales del servidor del museo o problemas de conexión intermitentes sin mostrar errores al usuario.
+*   **Filtrado inteligente de contenidos:** Las obras que carecen de imágenes o cuyos identificadores han sido eliminados de la base de datos del museo se descartan silenciosamente para no romper la visualización.
+*   **Visualización enriquecida de detalles:** La ficha de cada obra ahora presenta información contextual completa dividida en secciones lógicas: datos del artista, características físicas de la obra y ubicación geográfica histórica.
+*   **Indicadores de Dominio Público:** Se muestran distintivos visuales para identificar claramente las obras que son de libre uso y dominio público.
+*   **Navegación de retorno intuitiva:** Se ha añadido una navegación clara para volver a la lista de exploración desde el detalle sin perder el contexto de búsqueda.
+
