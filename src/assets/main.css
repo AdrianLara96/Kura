@@ -1,0 +1,85 @@
+/* ============================================
+   KURA - VARIABLES GLOBALES
+   ============================================ */
+
+:root {
+  /* Paleta de colores principal */
+  --kura-color1: #000706;
+  --kura-color2: #00272d;
+  --kura-color3: #134647;
+  --kura-color4: #0c7e7e;
+  --kura-color5: #bfac8b;
+  
+  /* Colores derivados */
+  --kura-bg: #fafafa;
+  --kura-bg-card: #ffffff;
+  --kura-text: #333333;
+  --kura-text-muted: #666666;
+  --kura-border: #e0e0e0;
+  
+  /* Tipografía */
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Espaciado */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* ============================================
+   RESET BÁSICO
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--kura-bg);
+  color: var(--kura-text);
+  font-family: var(--font-main);
+  line-height: 1.6;
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

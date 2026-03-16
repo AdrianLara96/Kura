@@ -238,16 +238,16 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 - Auth completo (login, registro, logout)
 - Perfiles de usuario editables
-- Integración API 
+- Integración API
 - Sincronización con cache (7 días)
 - Router protegido
 
 **Criterio de completado:**
 
-- [X] Usuario puede registrarse/loguearse
-- [X] Usuario puede editar su perfil
-- [X] Se pueden fetchear obras
-- [X] Las obras se guardan en cache en tu BD
+- [x] Usuario puede registrarse/loguearse
+- [x] Usuario puede editar su perfil
+- [x] Se pueden fetchear obras
+- [x] Las obras se guardan en cache en tu BD
 
 #### Fase 2: Exploración
 
@@ -260,9 +260,9 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 **Criterio de completado:**
 
-- [X] Grid de obras responsive
+- [x] Grid de obras responsive
 - [ ] Filtros funcionan correctamente
-- [X] Detalle de obra muestra toda la información
+- [x] Detalle de obra muestra toda la información
 - [ ] Home muestra obras destacadas del día
 
 #### Fase 3: Colecciones
@@ -339,7 +339,6 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 ### **Documento creado:** 04/03/2026\*
 
-
 ---
 
 # Bitácora de Desarrollo - Kura
@@ -378,6 +377,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 ## [2026-03-12] ✅ FASE 1: FOUNDATION - COMPLETADA
 
 ### Logros técnicos
+
 - [x] Auth con Supabase + Vue 3 (login, registro, logout, sesiones)
 - [x] Perfiles editables + Storage para avatares + RLS policies
 - [x] BD: user_profiles + museum_artworks con índices + caché TTL
@@ -389,6 +389,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 - [x] Estado de auth reactivo en toda la app (login/logout condicional)
 
 ### URLs verificadas (imágenes reales del Met)
+
 - DP-42549-001.jpg (Van Gogh - Wheat Field with Cypresses)
 - DP346475.jpg (Van Gogh - Roses)
 - DP164788.jpg (Dürer - Virgin and Child)
@@ -396,6 +397,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 - DP349564.jpg (El Greco - View of Toledo)
 
 ### Próximo: Fase 2 - Exploración avanzada
+
 - Grid responsive con lazy loading de imágenes
 - Filtros combinados: museo + período + artista + tags
 - Búsqueda full-text con índice GIN en PostgreSQL
@@ -414,35 +416,122 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ## Objetivos fase 2
 
-*   Integrar la API real de The Met reemplazando los datos simulados (mock data).
-*   Implementar un "Empty State" en la vista de exploración que evite búsquedas automáticas al cargar.
-*   Diseñar un layout responsive de dos columnas para la vista de detalle de obras.
-*   Mostrar más de 15 campos de metadatos extendidos (nacionalidad, edad del artista, materiales, dimensiones, contexto geográfico).
-*   Establecer un manejo robusto de errores con reintentos automáticos y tiempos de espera.
+- Integrar la API real de The Met reemplazando los datos simulados (mock data).
+- Implementar un "Empty State" en la vista de exploración que evite búsquedas automáticas al cargar.
+- Diseñar un layout responsive de dos columnas para la vista de detalle de obras.
+- Mostrar más de 15 campos de metadatos extendidos (nacionalidad, edad del artista, materiales, dimensiones, contexto geográfico).
+- Establecer un manejo robusto de errores con reintentos automáticos y tiempos de espera.
 
 ## Cambios técnicos realizados
 
-*   **Implementación de Retry con Backoff Exponencial:** Se creó una función personalizada para realizar peticiones HTTP que reintenta automáticamente hasta 3 veces si falla, esperando progresivamente más tiempo (1s, 2s, 4s) entre cada intento.
-*   **Gestión de Tiempos de Espera (Timeout):** Se estableció un límite máximo de 10 segundos por petición para evitar que la interfaz se quede bloqueada indefinidamente si la API externa no responde.
-*   **Normalización de Datos Centralizada:** Se desarrolló un proceso único que transforma la respuesta compleja de la API del Met al formato estandarizado que utiliza nuestra aplicación, filtrando automáticamente las obras que no tienen imágenes.
-*   **Estados de Carga Visuales (Skeleton Loaders):** Se sustituyeron los mensajes de texto de "Cargando..." por animaciones visuales que imitan la estructura del contenido final, mejorando la percepción de velocidad.
-*   **Lógica Condicional en Vistas:** Se refactorizó la lógica de renderizado para distinguir claramente entre estado inicial (sin búsqueda), carga, error, sin resultados y resultados exitosos.
-*   **Diseño Responsive con CSS Grid:** Se aplicó un sistema de rejilla que muestra dos columnas en pantallas grandes (imagen a la izquierda, información a la derecha) y colapsa a una sola columna vertical en dispositivos móviles.
+- **Implementación de Retry con Backoff Exponencial:** Se creó una función personalizada para realizar peticiones HTTP que reintenta automáticamente hasta 3 veces si falla, esperando progresivamente más tiempo (1s, 2s, 4s) entre cada intento.
+- **Gestión de Tiempos de Espera (Timeout):** Se estableció un límite máximo de 10 segundos por petición para evitar que la interfaz se quede bloqueada indefinidamente si la API externa no responde.
+- **Normalización de Datos Centralizada:** Se desarrolló un proceso único que transforma la respuesta compleja de la API del Met al formato estandarizado que utiliza nuestra aplicación, filtrando automáticamente las obras que no tienen imágenes.
+- **Estados de Carga Visuales (Skeleton Loaders):** Se sustituyeron los mensajes de texto de "Cargando..." por animaciones visuales que imitan la estructura del contenido final, mejorando la percepción de velocidad.
+- **Lógica Condicional en Vistas:** Se refactorizó la lógica de renderizado para distinguir claramente entre estado inicial (sin búsqueda), carga, error, sin resultados y resultados exitosos.
+- **Diseño Responsive con CSS Grid:** Se aplicó un sistema de rejilla que muestra dos columnas en pantallas grandes (imagen a la izquierda, información a la derecha) y colapsa a una sola columna vertical en dispositivos móviles.
 
 ## Archivos modificados o incluidos
 
-*   `src/services/museumApi.js`: Reescritura completa para conectar con la API real, incluyendo lógica de reintentos y normalización.
-*   `src/composables/useArtworks.js`: Ampliación con nuevas funciones para obtener obras destacadas, recargar búsquedas y limpiar errores.
-*   `src/views/explore/ExploreView.vue`: Modificación para eliminar la carga automática inicial e incluir el nuevo diseño de estado vacío con sugerencias.
-*   `src/views/explore/ArtworkDetail.vue`: Rediseño total de la interfaz para soportar el layout de dos columnas y la visualización detallada de metadatos.
+- `src/services/museumApi.js`: Reescritura completa para conectar con la API real, incluyendo lógica de reintentos y normalización.
+- `src/composables/useArtworks.js`: Ampliación con nuevas funciones para obtener obras destacadas, recargar búsquedas y limpiar errores.
+- `src/views/explore/ExploreView.vue`: Modificación para eliminar la carga automática inicial e incluir el nuevo diseño de estado vacío con sugerencias.
+- `src/views/explore/ArtworkDetail.vue`: Rediseño total de la interfaz para soportar el layout de dos columnas y la visualización detallada de metadatos.
 
 ## Resumen de nuevas funcionalidades
 
-*   **Búsqueda bajo demanda:** La aplicación ya no realiza peticiones innecesarias al abrir la sección de explorar; espera activamente a que el usuario introduzca un término o seleccione una sugerencia.
-*   **Sugerencias de búsqueda rápidas:** En la pantalla de inicio del explorador, se muestran chips interactivos con términos populares (como "Van Gogh" o "Arte Egipcio") para facilitar el descubrimiento inmediato.
-*   **Resiliencia ante fallos de red:** El sistema es capaz de recuperarse automáticamente de caídas temporales del servidor del museo o problemas de conexión intermitentes sin mostrar errores al usuario.
-*   **Filtrado inteligente de contenidos:** Las obras que carecen de imágenes o cuyos identificadores han sido eliminados de la base de datos del museo se descartan silenciosamente para no romper la visualización.
-*   **Visualización enriquecida de detalles:** La ficha de cada obra ahora presenta información contextual completa dividida en secciones lógicas: datos del artista, características físicas de la obra y ubicación geográfica histórica.
-*   **Indicadores de Dominio Público:** Se muestran distintivos visuales para identificar claramente las obras que son de libre uso y dominio público.
-*   **Navegación de retorno intuitiva:** Se ha añadido una navegación clara para volver a la lista de exploración desde el detalle sin perder el contexto de búsqueda.
+- **Búsqueda bajo demanda:** La aplicación ya no realiza peticiones innecesarias al abrir la sección de explorar; espera activamente a que el usuario introduzca un término o seleccione una sugerencia.
+- **Sugerencias de búsqueda rápidas:** En la pantalla de inicio del explorador, se muestran chips interactivos con términos populares (como "Van Gogh" o "Arte Egipcio") para facilitar el descubrimiento inmediato.
+- **Resiliencia ante fallos de red:** El sistema es capaz de recuperarse automáticamente de caídas temporales del servidor del museo o problemas de conexión intermitentes sin mostrar errores al usuario.
+- **Filtrado inteligente de contenidos:** Las obras que carecen de imágenes o cuyos identificadores han sido eliminados de la base de datos del museo se descartan silenciosamente para no romper la visualización.
+- **Visualización enriquecida de detalles:** La ficha de cada obra ahora presenta información contextual completa dividida en secciones lógicas: datos del artista, características físicas de la obra y ubicación geográfica histórica.
+- **Indicadores de Dominio Público:** Se muestran distintivos visuales para identificar claramente las obras que son de libre uso y dominio público.
+- **Navegación de retorno intuitiva:** Se ha añadido una navegación clara para volver a la lista de exploración desde el detalle sin perder el contexto de búsqueda.
 
+---
+
+## [2026-03-] FASE 3: COLECCIONES - SESIÓN 1 ✅
+
+### Completado
+
+- [x] **Paso 1:** Tablas Supabase creadas
+  - `collections` (10 columnas + FK a auth.users)
+  - `collection_items` (6 columnas + FK a collections + museum_artworks)
+  - 8 políticas RLS configuradas (4 por tabla)
+- [x] **Paso 2:** Composable `useCollections.js`
+  - Funciones CRUD: create, read, update, delete
+  - Funciones de items: addArtwork, removeArtwork, updateNote
+  - Estados reactivos: collections, currentCollection, items, loading, error
+  - Propiedad computada: isOwner
+- [x] **Paso 3:** Vista `MyCollectionsView.vue`
+  - Grid responsive de colecciones
+  - Estados: skeleton, error, empty, success
+  - Modales para crear/editar y confirmar borrado
+  - Acciones por colección: ver, editar, eliminar
+- [x] **Paso 4:** Componente `CollectionForm.vue`
+  - Formulario reutilizable con props y emits
+  - Validaciones en tiempo real (título, URL)
+  - Preview de imagen de portada
+  - Contador de caracteres para descripción
+  - Refactorización de MyCollectionsView para usar el componente
+- [x] **Paso Extra:** Variables CSS globales
+  - Paleta de colores Kura (5 colores principales)
+  - Variables de espaciado, border-radius, sombras
+  - Tipografía Inter como font-main
+  - Animaciones: pulse, shimmer, spin
+
+### Archivos Creados/Modificados
+
+| Archivo                                         | Tipo       | Descripción                  |
+| ----------------------------------------------- | ---------- | ---------------------------- |
+| `src/assets/main.css`                           | Creado     | Variables CSS globales       |
+| `src/composables/useCollections.js`             | Creado     | Lógica de colecciones        |
+| `src/views/collections/MyCollectionsView.vue`   | Creado     | Vista principal              |
+| `src/components/collections/CollectionForm.vue` | Creado     | Formulario reutilizable      |
+| `src/router/index.js`                           | Modificado | Ruta /my-collections añadida |
+
+### Decisiones Técnicas
+
+1. **Separación de formulario en componente:**
+   - Permite reutilización en múltiples rutas
+   - Facilita testing aislado
+   - Sigue Single Responsibility Principle
+
+2. **Validaciones en el componente hijo:**
+   - CollectionForm valida antes de emitir submit
+   - El componente padre recibe datos ya limpios
+   - Mejor separación de responsabilidades
+
+3. **Variables CSS en :root:**
+   - Consistencia visual en toda la app
+   - Fácil mantenimiento de la paleta
+   - Soporte para temas futuros (dark mode)
+
+### Pruebas Realizadas
+
+- [x] Crear colección nueva funciona
+- [x] Editar colección existente funciona
+- [x] Eliminar colección con confirmación funciona
+- [x] Validaciones de formulario activas
+- [x] Responsive en mobile (< 768px)
+- [x] Estados de carga y error visibles
+
+### Pendientes para Fase 3
+
+- [ ] Paso 5: Añadir botón "Añadir a colección" en ArtworkDetail.vue
+- [ ] Paso 6: Crear vista CollectionDetail.vue (ver colección)
+- [ ] Paso 7: Crear vista CollectionsGallery.vue (colecciones públicas)
+- [ ] Paso 8: Testing final y ajustes de UX
+
+### Notas
+
+- Las políticas RLS verifican que solo el dueño pueda editar/borrar
+- El formulario soporta modo crear y editar con misma interfaz
+- Las colecciones pueden ser públicas o privadas
+- Preview de portada valida que la URL sea imagen
+
+### Siguiente Sesión
+
+Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
+
+---
