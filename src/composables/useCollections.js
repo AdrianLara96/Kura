@@ -279,31 +279,62 @@ export function useCollections() {
   // ─────────────────────────────────────────────────────────────
   // MÉTODOS - OPERACIONES CON ITEMS DE COLECCIÓN
   // ─────────────────────────────────────────────────────────────
-  
+
   /**
-   * Añadir una obra a una colección
-   * @param {string} collectionId - UUID de la colección
-   * @param {string} artworkId - UUID de la obra
-   * @param {string} userNote - Nota opcional del usuario
-   * @returns {Object|null} El item creado o null si falla
-   */
+ * Añadir una obra a una colección
+ * @param {string} collectionId - UUID de la colección
+ * @param {string} artworkId - UUID de la obra (de museum_artworks.id)
+ * @param {string} userNote - Nota opcional del usuario
+ * @returns {Object|null} El item creado o null si falla
+ */
   async function addArtworkToCollection(collectionId, artworkId, userNote = '') {
     loading.value = true
     error.value = null
     
     try {
-      // Obtener la posición más alta actual para añadir al final
-      const { data: existingItems } = await supabase
+      // 1. Verificar que el artwork existe en museum_artworks
+      const { data: artworkExists, error: artworkError } = await supabase
+        .from('museum_artworks')
+        .select('id')
+        .eq('id', artworkId)
+        .single()
+      
+      if (artworkError || !artworkExists) {
+        throw new Error('La obra no existe en la base de datos')
+      }
+      
+      // 2. Verificar que la colección existe y pertenece al usuario
+      const { data: collectionExists, error: collectionError } = await supabase
+        .from('collections')
+        .select('id, user_id')
+        .eq('id', collectionId)
+        .single()
+      
+      if (collectionError || !collectionExists) {
+        throw new Error('La colección no existe o no tienes permiso')
+      }
+      
+      if (collectionExists.user_id !== user.value.id) {
+        throw new Error('No tienes permiso para añadir a esta colección')
+      }
+      
+      // 3. Obtener la posición más alta actual para añadir al final
+      const { data: existingItems, error: positionError } = await supabase
         .from('collection_items')
         .select('position')
         .eq('collection_id', collectionId)
         .order('position', { ascending: false })
         .limit(1)
       
+      if (positionError) {
+        console.warn('Error getting position:', positionError)
+      }
+      
       const newPosition = existingItems && existingItems.length > 0 
         ? existingItems[0].position + 1 
         : 1
       
+      // 4. Crear el item
       const newItem = {
         collection_id: collectionId,
         museum_artwork_id: artworkId,
@@ -325,9 +356,12 @@ export function useCollections() {
         `)
         .single()
       
-      if (insertError) throw insertError
+      if (insertError) {
+        console.error('Insert error details:', insertError)
+        throw insertError
+      }
       
-      // Actualizar estado local
+      // 5. Actualizar estado local
       items.value.push(data)
       
       return data
