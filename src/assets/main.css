@@ -1,50 +1,67 @@
 /* ============================================
-   KURA - VARIABLES GLOBALES
+   KURA - SISTEMA DE DISEÑO
    ============================================ */
 
 :root {
-  /* Paleta de colores principal */
-  --kura-color1: #000706;
-  --kura-color2: #00272d;
-  --kura-color3: #134647;
-  --kura-color4: #0c7e7e;
-  --kura-color5: #bfac8b;
+  /* --- PALETA BASE (Identidad de Marca) --- */
+  --kura-black: #000706;
+  --kura-deep-teal: #00272d;
+  --kura-teal: #134647;
+  --kura-bright-teal: #0c7e7e;
+  --kura-gold: #bfac8b;
+
+  /* --- VARIABLES SEMÁNTICAS (TEMA OSCURO POR DEFECTO) --- */
   
-  /* Colores derivados */
-  --kura-bg: #fafafa;
-  --kura-bg-card: #ffffff;
-  --kura-text: #333333;
-  --kura-text-muted: #666666;
-  --kura-border: #e0e0e0;
-  
+  /* Fondos */
+  --bg-primary: var(--kura-black);
+  --bg-secondary: var(--kura-deep-teal);
+  --bg-tertiary: rgba(255, 255, 255, 0.05);
+  --bg-overlay: rgba(0, 7, 6, 0.85);
+
+  /* Texto */
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #6e6e6e;
+  --text-accent: var(--kura-gold);
+
+  /* Bordes y Separadores */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-active: var(--kura-teal);
+  --border-highlight: var(--kura-gold);
+
+  /* Sombras (Ajustadas para fondo oscuro) */
+  /* En dark mode, las sombras son más sutiles o se usan bordes brillantes */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --glow-accent: 0 0 15px rgba(12, 126, 126, 0.4); /* Resplandor teal */
+
   /* Tipografía */
   --font-main: 'Inter', system-ui, -apple-system, sans-serif;
   
-  /* Espaciado */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 0.75rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
+  /* Espaciado (Escala consistente) */
+  --spacing-xs: 0.5rem;  /* 8px */
+  --spacing-sm: 0.75rem; /* 12px */
+  --spacing-md: 1rem;    /* 16px */
+  --spacing-lg: 1.5rem;  /* 24px */
+  --spacing-xl: 2rem;    /* 32px */
+  --spacing-xxl: 3rem;   /* 48px */
   
-  /* Border radius */
-  --radius-sm: 6px;
+  /* Border Radius */
+  --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 20px;
-  
-  /* Sombras */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
-  
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
   /* Transiciones */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s ease;
 }
 
 /* ============================================
-   RESET BÁSICO
+   RESET BÁSICO & CONFIGURACIÓN GLOBAL
    ============================================ */
 
 * {
@@ -53,21 +70,63 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--kura-bg);
-  color: var(--kura-text);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: var(--font-main);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased; /* Mejora la renderización de fuentes en Mac */
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar personalizado para Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--kura-teal);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--kura-bright-teal);
 }
 
 /* ============================================
-   UTILIDADES
+   UTILIDADES DE LAYOUT
    ============================================ */
 
 .container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--spacing-lg);
+}
+
+/* Clases de utilidad para texto */
+.text-gradient {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--kura-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-muted {
+  color: var(--text-secondary);
 }
 
 /* ============================================
@@ -76,10 +135,33 @@ body {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.6; }
 }
 
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Clase utilitaria para animaciones de entrada */
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) forwards;
+}
+
+/* Loader Skeleton (Útil mientras cargan las APIs) */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-tertiary) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
 }

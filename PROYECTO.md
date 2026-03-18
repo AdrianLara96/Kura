@@ -450,7 +450,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ---
 
-## [2026-03-] FASE 3: COLECCIONES - SESIÓN 1 ✅
+## [2026-03-16] FASE 3: COLECCIONES - SESIÓN 1 ✅
 
 ### Completado
 
@@ -533,5 +533,47 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 ### Siguiente Sesión
 
 Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
+
+---
+
+## [2026-03-17] FASE 3: COLECCIONES - SESIÓN 2 ✅
+
+### Completado
+
+- [x] **Paso 5:** Añadir obras a colecciones desde ArtworkDetail.vue
+  - Botón "➕ Añadir a colección" en vista de detalle
+  - Modal de selección de colecciones existentes
+  - Creación rápida de colecciones sin salir del modal
+  - Sincronización automática de obras en museum_artworks
+  - Función RPC `sync_museum_artwork` con SECURITY DEFINER
+  - Toast notifications para feedback de éxito/error
+  - Validación de usuario autenticado
+
+### Archivos Modificados
+
+| Archivo                               | Cambios                                 |
+| ------------------------------------- | --------------------------------------- |
+| `src/views/explore/ArtworkDetail.vue` | +200 líneas (modales, lógica de añadir) |
+| `src/composables/useCollections.js`   | Corrección en addArtworkToCollection    |
+| Supabase Functions                    | Nueva función: sync_museum_artwork      |
+
+### Problemas Solucionados
+
+1. **Error 403 (RLS)** → Función RPC con SECURITY DEFINER
+2. **Error 406 (SELECT)** → Eliminado SELECT previo, solo RPC
+3. **artwork.id undefined** → Sincronización on-demand de obras
+
+### Pruebas Realizadas
+
+- [x] Añadir obra a colección existente
+- [x] Crear nueva colección desde modal
+- [x] Verificación de obras en /my-collections
+- [x] Consola limpia sin errores
+
+### Pendientes para Fase 3
+
+- [ ] Paso 6: Crear vista CollectionDetail.vue (ver colección)
+- [ ] Paso 7: Crear vista CollectionsGallery.vue (colecciones públicas)
+- [ ] Paso 8: Testing final y ajustes de UX
 
 ---
