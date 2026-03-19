@@ -16,7 +16,7 @@
 | **Tipo**              | Plataforma web de descubrimiento cultural |
 | **Stack**             | Vue 3 + Vite + JavaScript + Supabase      |
 | **Duración estimada** | 8 semanas (MVP de 4 fases)                |
-| **APIs**              | Rijksmuseum, The Met, Museo del Prado     |
+| **APIs**              | The Met                                   |
 
 ---
 
@@ -55,7 +55,7 @@
 | ---------------- | ----------- | ------------------------------- |
 | id               | uuid        | PK                              |
 | museum_id        | text        | ID en la API del museo          |
-| museum_name      | text        | 'Rijksmuseum', 'Met', 'Prado'   |
+| museum_name      | text        | 'Met'                           |
 | external_url     | text        | URL original en el museo        |
 | title            | text        | Título de la obra               |
 | artist_name      | text        | Nombre del artista              |
@@ -188,24 +188,63 @@
 ### Estructura de Carpetas
 
 src/
+├── assets/
+│ ├── kura-icon.svg
+│ ├── main.css
+│ └── vue.svg
+│
 ├── services/
 │ ├── museumApi.js # APIs de museos
+│ ├── storageService.js # Gestión de avatares
 │ └── syncService.js # Sincronización con BD
+│
 ├── composables/
+│ ├── useArtworks.js
 │ ├── useAuth.js
-│ ├── useCollections.js
-│ └── useNotifications.js
+│ └── useCollections.js
+│
 ├── views/
 │ ├── auth/
-│ ├── profile/
-│ ├── explore/
+│ │ ├── LoginView.vue
+│ │ └── RegisterView.vue
 │ ├── collections/
-│ └── dashboard/
-└── components/
-├── artworks/
-├── collections/
-├── comments/
-└── common/
+│ │ ├── CollectionDetail.vue
+│ │ ├── CollectionGallery.vue
+│ │ └── MyCollectionsView.vue
+│ ├── dashboard/
+│ │ └── DashboardView.vue
+│ ├── explore/
+│ │ ├── ArtworkDetail.vue
+│ │ └── ExploreView.vue
+│ ├── profile/
+│ │ ├── ProfileEdit.vue
+│ │ └── PublicProfileView.vue
+│ └── HomeView.vue
+│
+├── components/
+│ ├── artworks/
+│ ├── collections/
+│ │ ├── CollectionCard.vue
+│ │ └── CollectionForm.vue
+│ ├── comments/
+│ └── common/
+│ └── TopNav.vue
+│
+├── router/
+│ └── index.js
+│
+├── supabase/
+│ └── client.js
+│
+├── router/
+│ └── index.js
+│
+├── utils/
+│ └── placeholder.js
+│
+├── App.vue
+├── main.js
+└── style.css
 
 ---
 
@@ -213,11 +252,7 @@ src/
 
 | Museo              | URL                              | Key         | Obras      |
 | ------------------ | -------------------------------- | ----------- | ---------- |
-| Rijksmuseum 🇳🇱     | rijksmuseum.nl/api/en/collection | Sí (gratis) | 600,000+   |
 | The Met 🇺🇸         | collectionapi.metmuseum.org      | No          | 490,000+   |
-| Museo del Prado 🇪🇸 | museodelprado.es/api             | No          | 18,000+    |
-| V&A 🇬🇧             | vam.ac.uk/api                    | Sí (gratis) | 1,000,000+ |
-| Smithsonian 🇺🇸     | api.si.edu                       | Sí (gratis) | 3,300,000+ |
 
 ---
 
@@ -228,7 +263,7 @@ VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
 VITE_SUPABASE_ANON_KEY=tu_clave_anon_public
 
 **APIs de Museos**
-VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
+De momento, ninguna.
 
 ---
 
@@ -261,9 +296,7 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 **Criterio de completado:**
 
 - [x] Grid de obras responsive
-- [ ] Filtros funcionan correctamente
 - [x] Detalle de obra muestra toda la información
-- [ ] Home muestra obras destacadas del día
 
 #### Fase 3: Colecciones
 
@@ -275,10 +308,10 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 **Criterio de completado:**
 
-- [ ] Crear colección con título y descripción
-- [ ] Añadir obras desde el explorador
-- [ ] Ver colección propia y pública
-- [ ] Editar/eliminar colecciones propias
+- [x] Crear colección con título y descripción
+- [x] Añadir obras a la colección desde el explorador
+- [x] Ver colección propia y pública
+- [x] Editar/eliminar colecciones propias
 
 #### Fase 4: Comunidad
 
@@ -301,7 +334,7 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 
 | Feature                                          | Complejidad |
 | ------------------------------------------------ | ----------- |
-| Más museos (Met, Prado, V&A)                     | Baja        |
+| Más museos                                       | Baja        |
 | Artistas emergentes (upload obras)               | Media       |
 | "Inspirado por" (vincular clásico-contemporáneo) | Media       |
 | Rutas de aprendizaje                             | Media       |
@@ -320,24 +353,11 @@ VITE_RIJKS_API_KEY=tu_api_key_de_rijksmuseum
 | ---------------------- | ------------------------------------------------ |
 | Documentación Vue 3    | https://vuejs.org/                               |
 | Documentación Supabase | https://supabase.com/docs                        |
-| Rijksmuseum API        | https://data.rijksmuseum.nl/object-metadata/api/ |
 | The Met API            | https://metmuseum.github.io/                     |
-| Museo del Prado API    | https://www.museodelprado.es/api/                |
 
 ---
 
-### 📝 Notas para Cuando Empiece el Proyecto
-
-1. **Empezar con Fase 1** siguiendo el orden establecido
-2. **Obtener API key de Rijksmuseum** antes de comenzar (gratis, 5 minutos)
-3. **Configurar RLS policies** antes de cualquier prueba
-4. **Implementar cache de 7 días** para reducir llamadas a APIs
-5. **Mantener .env fuera de Git** usando .gitignore
-6. **Documentar cada fase** en este mismo archivo
-
----
-
-### **Documento creado:** 04/03/2026\*
+### **Documento creado:** 04/03/2026
 
 ---
 
@@ -374,7 +394,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ---
 
-## [2026-03-12] ✅ FASE 1: FOUNDATION - COMPLETADA
+## [2026-03-12] FASE 1: FOUNDATION - COMPLETADA
 
 ### Logros técnicos
 
@@ -406,11 +426,10 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ---
 
-# 📅 Fase 2: Exploración - Documentación Técnica
+# [2026-03-13] FASE 2: EXPLORACIÓN - COMPLETADA
 
 **Fecha de inicio:** 13 de marzo de 2026  
 **Fecha de finalización:** 14 de marzo de 2026  
-**Estado:** ✅ COMPLETADA
 
 ---
 
@@ -450,7 +469,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ---
 
-## [2026-03-16] FASE 3: COLECCIONES - SESIÓN 1 ✅
+## [2026-03-16] FASE 3: COLECCIONES - SESIÓN 1 
 
 ### Completado
 
@@ -536,7 +555,7 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ---
 
-## [2026-03-17] FASE 3: COLECCIONES - SESIÓN 2 ✅
+## [2026-03-17] FASE 3: COLECCIONES - SESIÓN 2 
 
 ### Completado
 
@@ -577,3 +596,67 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 - [ ] Paso 8: Testing final y ajustes de UX
 
 ---
+
+## [2026-03-18] FASE 3: COLECCIONES - SESIÓN 3 - FASE COMPLETADA 
+
+### Criterios completados
+
+- [x] Crear colección con título y descripción
+- [x] Añadir obras desde el explorador
+- [x] Ver colección propia y pública
+- [x] Editar/eliminar colecciones propias
+
+### Archivos Creados
+
+| Archivo                                         | Propósito                   |
+| ----------------------------------------------- | --------------------------- |
+| `src/assets/main.css`                           | Variables CSS globales      |
+| `src/composables/useCollections.js`             | Lógica CRUD colecciones     |
+| `src/components/collections/CollectionCard.vue` | Tarjeta reutilizable        |
+| `src/components/collections/CollectionForm.vue` | Formulario validado         |
+| `src/views/collections/MyCollectionsView.vue`   | Gestión colecciones propias |
+| `src/views/collections/CollectionDetail.vue`    | Detalle de colección        |
+| `src/views/collections/CollectionsGallery.vue`  | Galería pública             |
+
+### Archivos Modificados
+
+| Archivo                               | Cambios                            |
+| ------------------------------------- | ---------------------------------- |
+| `src/views/explore/ArtworkDetail.vue` | Botón añadir a colección + modales |
+| `src/router/index.js`                 | Rutas de colecciones               |
+| Supabase Functions                    | `sync_museum_artwork` RPC          |
+
+### Bugs Solucionados (Sesión 18/03)
+
+1. **FK inexistente** → Creamos FK `collections.user_id` → `user_profiles.id`
+2. **Portadas no visibles** → Fetch `museum_artworks (thumbnail_url, image_url)`
+3. **Navegación rota** → Ruta `/collections/:id` en vez de `/my-collections/:id`
+4. **Obra no se añade** → `syncArtworkToDatabase()` antes de `addArtworkToCollection`
+5. **Búsqueda 400** → `.or()` → `.ilike()` en título
+6. **Orden no cambiaba** → `@change="() => loadCollections(false)"`
+
+### Pruebas Realizadas
+
+- [x] Galería pública `/collections` muestra colecciones
+- [x] Búsqueda por título funciona
+- [x] Ordenamiento (recentes/antiguas/vistas/obras) funciona
+- [x] Click en colección navega a detalle
+- [x] Crear colección desde `/my-collections` funciona
+- [x] Editar colección existente funciona
+- [x] Eliminar colección con confirmación funciona
+- [x] Añadir obra desde `/artwork/:id` funciona
+- [x] Crear colección + añadir obra automáticamente funciona
+
+### Pendientes para Fase 4
+
+- [ ] Contador de vistas (incrementar al ver colección)
+- [ ] Likes en colecciones
+- [ ] Comentarios en colecciones
+- [ ] Seguir/dejar de seguir usuarios
+- [ ] Notificaciones de interacciones
+- [ ] Menú hamburguesa móvil en TopNav
+
+---
+
+## [2026-03-19] FASE 4: COMUNIDAD
+

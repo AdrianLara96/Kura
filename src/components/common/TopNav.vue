@@ -17,6 +17,14 @@
           Explorar
         </router-link>
 
+        <router-link
+          to="/collections"
+          class="nav-link"
+          active-class="nav-link-active"
+        >
+          Colecciones
+        </router-link>
+
         <!-- Grupo Autenticado -->
         <template v-if="isAuthenticated">
           <router-link 
@@ -25,6 +33,14 @@
             active-class="nav-link-active"
           >
             Dashboard
+          </router-link>
+
+          <router-link
+            to="/my-collections"
+            class="nav-link"
+            active-class="nav-link-active"
+          >
+            Mis Colecciones
           </router-link>
           
           <router-link 

@@ -11,6 +11,8 @@ import ArtworkDetail from '@/views/explore/ArtworkDetail.vue'
 import ProfileEdit from '@/views/profile/ProfileEdit.vue'
 import PublicProfileView from '@/views/profile/PublicProfileView.vue'
 import MyCollectionsView from '@/views/collections/MyCollectionsView.vue'
+import CollectionDetail from '@/views/collections/CollectionDetail.vue'
+import CollectionsGallery from '@/views/collections/CollectionsGallery.vue'
 
 // Guard simple para rutas protegidas
 async function requireAuth(to, from, next) {
@@ -31,7 +33,9 @@ const routes = [
   { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
   { path: '/my-profile', name: 'profile-edit', component: ProfileEdit, meta: { requireAuth: true } },
   { path: '/profile/:username', name: 'public-profile', component: PublicProfileView, meta: { requireAuth: false } },
-  { path: '/my-collections', name: 'my-collections', component: MyCollectionsView, meta: { requiresAuth: true } }
+  { path: '/collections', name: 'collections', component: CollectionsGallery, meta: { requireAuth: false } },
+  { path: '/my-collections', name: 'my-collections', component: MyCollectionsView, meta: { requiresAuth: true } },
+  { path: '/collections/:id', name: 'CollectionDetail', component: CollectionDetail, meta: { requiresAuth: false } }
 ]
 
 const router = createRouter({

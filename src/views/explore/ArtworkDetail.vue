@@ -482,21 +482,31 @@ const handleQuickCreateCollection = async () => {
   if (!quickCollectionData.value.title.trim()) return
   quickCreateLoading.value = true
   try {
+    // Crear la colección
     const newCollection = await createCollection({
       title: quickCollectionData.value.title.trim(),
       description: `Creada desde ${artwork.value?.title}`,
       is_public: quickCollectionData.value.is_public
     })
+    
     if (newCollection) {
-      const result = await addArtworkToCollection(newCollection.id, artwork.value.id)
+      // Sincronizar obra en BD (obtener UUID real)
+      const artworkId = await syncArtworkToDatabase()
+      
+      // Añadir obra a la colección
+      const result = await addArtworkToCollection(newCollection.id, artworkId)
+      
       if (result) {
         showToast('success', 'Colección creada y obra añadida')
         closeCreateCollectionForm()
         closeCollectionModal()
+        // Recargar colecciones para actualizar la UI
+        await loadUserCollections()
       }
     }
   } catch (err) {
     showToast('error', err.message)
+    console.error('Error in handleQuickCreateCollection:', err)
   } finally {
     quickCreateLoading.value = false
   }
