@@ -43,11 +43,18 @@ src/
 ├── components/         # Componentes UI reutilizables
 │ ├── artworks/         # Tarjetas y detalles de obras
 │ ├── collections/      # Formularios y listas de colecciones
-│ └── common/           # Elementos comunes (Nav, Footer, Modals)
+│ ├── comments/         # Sección de comentarios (CommentsSection.vue)
+│ └── common/           # Elementos comunes (Nav, LikeButton, FollowButton)
 ├── composables/        # Lógica de estado reutilizable
+│   ├── useAuth.js
+│   ├── useCollections.js
+│   ├── useArtworks.js
+│   └── useCommunity.js # NUEVO - Interacciones sociales
 ├── router/             # Configuración de rutas protegidas y públicas
 ├── services/           # Conexión con APIs externas y Supabase
 ├── views/              # Vistas principales de la aplicación
+│   ├── notifications/  # NUEVO - Bandeja de notificaciones
+│   └── ...
 └── App.vue             # Componente raíz
 
 ---
@@ -69,10 +76,15 @@ src/
 - **Sincronización On-Demand:** Las obras se guardan en la base de datos local automáticamente al ser añadidas a una colección, optimizando el rendimiento.
 - **Visibilidad:** Control granular sobre la privacidad de las colecciones (Público/Privado).
 
-### 3. Perfiles y Comunidad (En desarrollo)
+### 3. Perfiles y Comunidad
 
 - **Perfiles de Usuario:** Personalización de biografía, avatar y tipo de usuario (artista, curador, entusiasta).
-- **Interacción Social:** Sistema de likes, comentarios y seguimiento entre usuarios (Roadmap Fase 4).
+- **Interacción Social:**
+  - **Likes:** Dar y quitar like a colecciones con contador en tiempo real.
+  - **Comentarios:** Sistema completo de comentarios (crear, editar, eliminar) en colecciones.
+  - **Seguir:** Seguir y dejar de seguir a otros curadores con contador de seguidores.
+  - **Notificaciones:** Bandeja de notificaciones con contador de no leídas y actualizaciones en tiempo real.
+- **Contador de Vistas:** Tracking automático de visualizaciones por colección.
 
 ---
 
@@ -82,9 +94,12 @@ La base de datos relacional en PostgreSQL (Supabase) se estructura principalment
 
 - `user_profiles`: Extensión de la tabla de autenticación con datos públicos y preferencias.
 - `museum_artworks`: Caché local de obras obtenidas de la API externa, indexadas para búsquedas rápidas.
-- `collections`: Contenedores temáticos creados por los usuarios.
+- `collections`: Contenedores temáticos creados por los usuarios (incluye view_count, like_count).
 - `collection_items`: Tabla intermedia que relaciona obras con colecciones, almacenando el orden y notas del usuario.
-- `likes`, `comments`, `follows`: Tablas para gestionar la interacción social.
+- `likes`: Relación muchos-a-muchos entre usuarios y colecciones (con unique constraint).
+- `comments`: Comentarios de usuarios en colecciones (con trigger para updated_at).
+- `follows`: Relaciones de seguimiento entre usuarios (auto-referencial a user_profiles).
+- `notifications`: Bandeja de notificaciones por tipo (new_follower, new_comment, collection_liked).
 
 **Seguridad:** Todas las operaciones de lectura y escritura están protegidas mediante políticas RLS (Row Level Security) que garantizan que los usuarios solo puedan modificar sus propios recursos, mientras que los datos públicos son legibles globalmente. Se utilizan funciones RPC con `SECURITY DEFINER` para operaciones de sincronización seguras.
 
@@ -147,7 +162,7 @@ El proyecto se ha ejecutado siguiendo una metodología iterativa dividida en fas
 | **1. Foundation**  | Completado | Autenticación, perfiles de usuario, integración básica con The Met y esquema de base de datos.                    |
 | **2. Exploración** | Completado | Motor de búsqueda, filtros avanzados, vista de detalle enriquecida, skeleton loaders y manejo robusto de errores. |
 | **3. Colecciones** | Completado | CRUD de colecciones, relación obras-colecciones, galerías públicas, sincronización de datos y funciones RPC.      |
-| **4. Comunidad**   | Pendiente  | Sistema de likes, comentarios, seguimiento de usuarios y notificaciones en tiempo real.                           |
+| **4. Comunidad**   | Completado | Sistema de likes, comentarios, seguimiento de usuarios y notificaciones en tiempo real.                           |
 
 ---
 
@@ -161,5 +176,19 @@ Este proyecto sirve como base para el aprendizaje de arquitecturas web modernas 
 
 Los datos de las obras de arte pertenecen a The Metropolitan Museum of Art y se distribuyen bajo su política de uso de datos (generalmente dominio público o Creative Commons Zero para imágenes). El código de la plataforma está disponible bajo licencia abierta para fines educativos y de desarrollo.
 
+---
+
+## Estado Actual
+
+**Versión:** MVP 1.0.0  
+**Fases Completadas:** 4/4  
+**Estado:** MVP Completo
+
+Hemos completado el roadmap inicial de 4 fases y el proyecto está listo para:
+- Testing final de UX
+- Deploy a producción
+- Feedback de usuarios beta
+
+
 **Desarrollador Principal:** Adrian Lara  
-**Fecha de última actualización:** 18 de Marzo de 2026
+**Fecha de última actualización:** 20 de Marzo de 2026

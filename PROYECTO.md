@@ -201,7 +201,8 @@ src/
 ├── composables/
 │ ├── useArtworks.js
 │ ├── useAuth.js
-│ └── useCollections.js
+│ ├── useCollections.js
+│ └── useCommunity.js          # NUEVO - Fase 4
 │
 ├── views/
 │ ├── auth/
@@ -219,6 +220,8 @@ src/
 │ ├── profile/
 │ │ ├── ProfileEdit.vue
 │ │ └── PublicProfileView.vue
+│ ├── notifications/
+│ │ └── NotificationsView.vue  # NUEVO - Fase 4
 │ └── HomeView.vue
 │
 ├── components/
@@ -227,8 +230,11 @@ src/
 │ │ ├── CollectionCard.vue
 │ │ └── CollectionForm.vue
 │ ├── comments/
+│ │ └── CommentsSection.vue    # NUEVO - Fase 4
 │ └── common/
-│ └── TopNav.vue
+│ │ ├── TopNav.vue
+│ │ ├── LikeButton.vue         # NUEVO - Fase 4
+│ │ └── FollowButton.vue       # NUEVO - Fase 4
 │
 ├── router/
 │ └── index.js
@@ -323,10 +329,10 @@ De momento, ninguna.
 
 **Criterio de completado:**
 
-- [ ] Dar like a colecciones
-- [ ] Comentar en colecciones
-- [ ] Seguir/dejar de seguir usuarios
-- [ ] Recibir notificaciones cuando alguien interactúa contigo
+- [X] Dar like a colecciones
+- [X] Comentar en colecciones
+- [X] Seguir/dejar de seguir usuarios
+- [X] Recibir notificaciones cuando alguien interactúa contigo
 
 ---
 
@@ -658,5 +664,159 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ---
 
-## [2026-03-19] FASE 4: COMUNIDAD
+## [2026-03-20] FASE 4: COMUNIDAD - SESIÓN 1
+
+**Fecha de inicio:** 19 de marzo de 2026  
+**Fecha de finalización:** 20 de marzo de 2026  
+
+---
+
+### Objetivos Fase 4
+
+- Implementar sistema de likes en colecciones
+- Añadir sección de comentarios en colecciones
+- Permitir seguir/dejar de seguir usuarios
+- Crear bandeja de notificaciones
+- Incrementar contador de vistas en colecciones
+
+---
+
+### Cambios Técnicos Realizados
+
+#### Base de Datos (Supabase)
+
+- **4 tablas nuevas creadas:**
+  - `likes` (user_id, collection_id, created_at)
+  - `comments` (user_id, collection_id, content, created_at, updated_at)
+  - `follows` (follower_id, following_id, created_at)
+  - `notifications` (user_id, type, message, link_url, is_read, created_at)
+
+- **Políticas RLS configuradas:**
+  - Likes/comments/follows: SELECT público, INSERT solo auth.uid() = user_id
+  - Notifications: SELECT/UPDATE solo el usuario propietario
+
+#### Composables
+
+- **`useCommunity.js` creado:**
+  - Funciones: `toggleLike()`, `fetchComments()`, `addComment()`, `updateComment()`, `deleteComment()`
+  - Funciones: `toggleFollow()`, `fetchFollowStatus()`, `fetchNotifications()`, `markAsRead()`
+  - Estados reactivos: `likeCount`, `hasLiked`, `comments`, `followerCount`, `isFollowing`, `notifications`, `unreadCount`
+
+#### Componentes Nuevos
+
+| Componente | Ubicación | Propósito |
+|------------|-----------|-----------|
+| `LikeButton.vue` | `components/common/` | Botón de like con corazón y contador |
+| `FollowButton.vue` | `components/common/` | Botón seguir/dejar de seguir con contador |
+| `CommentsSection.vue` | `components/comments/` | CRUD completo de comentarios |
+| `NotificationsView.vue` | `views/notifications/` | Bandeja de notificaciones |
+
+#### Vistas Actualizadas
+
+| Vista | Cambios |
+|-------|---------|
+| `CollectionDetail.vue` | +LikeButton, +CommentsSection, +FollowButton, +contador de vistas |
+| `TopNav.vue` | +Icono notificaciones con badge, +dropdown de notificaciones, +menú usuario mejorado |
+| `router/index.js` | +Ruta `/notifications` protegida |
+
+---
+
+### Bugs Solucionados
+
+| Error | Causa | Solución |
+|-------|-------|----------|
+| Corazón invisible en LikeButton | Clases Tailwind no disponibles | Refactorizar a CSS nativo con variables del Design System |
+| Texto duplicado en FollowButton hover | CSS `::after` superponía texto | Usar clases condicionales con `v-if`/`v-else` |
+| Error 409 (duplicate key) en likes/follows | INSERT sin verificar existencia previa | Consultar con `.maybeSingle()` antes de INSERT/DELETE |
+| Error `onUnmounted` en TopNav | Hooks de lifecycle después de `await` | Registrar `onUnmounted` antes de cualquier `await` |
+| Warning prop `collectionOwnerId` | Prop requerido recibía `null` | Cambiar a `required: false` + `v-if` en padre |
+
+---
+
+### Decisiones Técnicas
+
+1. **Sin Tailwind CSS:** El proyecto usa CSS nativo con variables CSS del Design System para mantener consistencia visual.
+
+2. **Verificación BD antes de acción:** Para evitar errores 409, se consulta el estado real en la base de datos antes de INSERTAR o ELIMINAR.
+
+3. **Notificaciones sin triggers automáticos:** Las notificaciones se generan manualmente (pendiente: triggers en Supabase para automatizar).
+
+4. **Contador de vistas optimista:** Se incrementa al cargar la colección (solo si no es el dueño), sin esperar confirmación.
+
+---
+
+### Pruebas Realizadas
+
+- [x] Dar like a colección → contador incrementa, corazón se rellena
+- [x] Quitar like → contador decrementa, corazón se vacía
+- [x] Comentar en colección → comentario aparece inmediatamente
+- [x] Editar comentario propio → cambios se guardan
+- [x] Eliminar comentario propio → comentario desaparece
+- [x] Seguir usuario → botón cambia a "Siguiendo"
+- [x] Dejar de seguir → botón vuelve a "Seguir"
+- [x] Ver notificaciones → bandeja muestra últimas interacciones
+- [x] Marcar como leída → badge desaparece
+- [x] Contador de vistas → incrementa al recargar página
+
+---
+
+### Archivos Creados
+
+| Archivo | Tipo | Líneas aprox. |
+|---------|------|---------------|
+| `src/composables/useCommunity.js` | Composable | ~350 |
+| `src/components/common/LikeButton.vue` | Componente | ~180 |
+| `src/components/common/FollowButton.vue` | Componente | ~220 |
+| `src/components/comments/CommentsSection.vue` | Componente | ~450 |
+| `src/views/notifications/NotificationsView.vue` | Vista | ~380 |
+
+### Archivos Modificados
+
+| Archivo | Cambios |
+|---------|---------|
+| `src/views/collections/CollectionDetail.vue` | +200 líneas (integración social) |
+| `src/components/common/TopNav.vue` | +150 líneas (notificaciones dropdown) |
+| `src/router/index.js` | +5 líneas (ruta notifications) |
+| `src/composables/useCommunity.js` | Correcciones en `toggleLike` y `toggleFollow` |
+
+---
+
+### Pendientes Post-MVP
+
+| Feature | Prioridad | Complejidad |
+|---------|-----------|-------------|
+| Triggers automáticos para notificaciones | Media | Baja |
+| Actualizar PublicProfileView con followers/following | Alta | Media |
+| Menú hamburguesa móvil en TopNav | Baja | Baja |
+| Footer de la aplicación | Baja | Baja |
+| Testing E2E de flujos sociales | Media | Media |
+
+---
+
+### Notas
+
+- **Design System respetado:** Tema oscuro, sin emojis, iconos SVG inline, variables CSS globales.
+- **RLS funcionando:** Todas las tablas tienen políticas de seguridad configuradas.
+- **Errores 409 solucionados:** Verificación en BD antes de INSERTAR previene duplicados.
+- **Sesión estable:** Auth state se mantiene entre recargas y navegación.
+
+---
+
+### Siguiente Sesión
+
+- Actualizar `PublicProfileView.vue` para mostrar seguidores/seguidos
+- Implementar triggers de notificaciones automáticas en Supabase
+- Añadir footer y ajustar márgenes finales
+- Testing final de UX y preparación para deploy
+
+---
+
+## 📊 Estado del Proyecto
+
+| Fase | Estado | Fecha Completado |
+|------|--------|------------------|
+| Fase 1: Foundation | ✅ Completada | 12/03/2026 |
+| Fase 2: Exploración | ✅ Completada | 14/03/2026 |
+| Fase 3: Colecciones | ✅ Completada | 18/03/2026 |
+| Fase 4: Comunidad | ✅ Completada | 21/03/2026 |
 
