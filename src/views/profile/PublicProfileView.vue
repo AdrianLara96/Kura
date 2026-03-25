@@ -65,6 +65,18 @@
                 <span>{{ getUserTypeLabel(profile.user_type) }}</span>
               </div>
 
+              <!-- Contadores de seguidores/seguidos -->
+              <div class="follow-stats">
+                <div class="stat-item">
+                  <span class="stat-number">{{ followerCount }}</span>
+                  <span class="stat-label">Seguidores</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">{{ followingCount }}</span>
+                  <span class="stat-label">Siguiendo</span>
+                </div>
+              </div>
+
               <p v-if="profile.bio" class="bio-text">{{ profile.bio }}</p>
 
               <div class="meta-data">
@@ -83,6 +95,18 @@
                   <span>Visitar sitio web</span>
                 </a>
               </div>
+
+              <!-- FollowButton (solo si no es el propio usuario) -->
+              <div v-if="currentUserId && currentUserId !== profile.id" class="follow-action">
+                <FollowButton
+                  :targetUserId="profile.id"
+                  :initialFollowersCount="followerCount"
+                  :initialFollowing="false"
+                  size="lg"
+                  variant="default"
+                />
+              </div>
+
             </div>
           </div>
         </header>
@@ -167,11 +191,14 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useAuth } from '@/composables/useAuth'
+import { useCommunity } from '@/composables/useCommunity'
 import TopNav from '@/components/common/TopNav.vue'
+import FollowButton from '@/components/common/FollowButton.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { getDefaultAvatar } = useAuth()
+const { fetchFollowStatus, followerCount, followingCount } = useCommunity()
 
 const username = computed(() => route.params.username)
 const loading = ref(true)
@@ -179,6 +206,7 @@ const error = ref(null)
 const profile = ref(null)
 const collections = ref([])
 const activeTab = ref('collections')
+const currentUserId = ref(null)
 
 // Mapeo de tipos de usuario a etiquetas legibles
 const getUserTypeLabel = (type) => {
@@ -201,14 +229,18 @@ const getCollectionCover = (collection) => {
 }
 
 const goToCollection = (id) => {
-  router.push(`/my-collections/${id}`) // O la ruta pública si existe
+  router.push(`/collections/${id}`)
 }
 
 onMounted(async () => {
   try {
-    // 1. Buscar perfil por username
+    // Obtener usuario actual
+    const { data: authData } = await supabase.auth.getUser()
+    currentUserId.value = authData?.user?.id || null
+
+    // Buscar perfil por username
     const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
+      .from('user_profiles')
       .select(`
         *,
         collections (
@@ -221,7 +253,7 @@ onMounted(async () => {
         )
       `)
       .eq('username', username.value)
-      .eq('is_public', true) // Solo perfiles públicos
+      .eq('is_public', true)
       .single()
 
     if (profileError || !profileData) {
@@ -229,8 +261,14 @@ onMounted(async () => {
     }
 
     profile.value = profileData
+    
     // Filtrar solo colecciones públicas
     collections.value = profileData.collections.filter(c => c.is_public)
+
+    // Cargar estado de follows
+    if (profileData.id) {
+      await fetchFollowStatus(profileData.id)
+    }
 
   } catch (err) {
     console.error('Error loading profile:', err)
@@ -412,6 +450,43 @@ onMounted(async () => {
 
 .meta-item svg {
   flex-shrink: 0;
+}
+
+/* ============================================
+   FOLLOW STATS & ACTION
+   ============================================ */
+
+.follow-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.follow-action {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* ============================================

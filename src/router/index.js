@@ -14,6 +14,7 @@ import MyCollectionsView from '@/views/collections/MyCollectionsView.vue'
 import CollectionDetail from '@/views/collections/CollectionDetail.vue'
 import CollectionsGallery from '@/views/collections/CollectionsGallery.vue'
 import NotificationsView from '@/views/notifications/NotificationsView.vue'
+import CommunityView from '@/views/community/CommunityView.vue'
 
 // Guard simple para rutas protegidas
 async function requireAuth(to, from, next) {
@@ -26,17 +27,21 @@ async function requireAuth(to, from, next) {
 }
 
 const routes = [
+  // Auth
+  { path: '/login', name: 'login', component: LoginView, meta: { requiresAuth: false, hideForAuth: true } },
+  { path: '/register', name: 'register', component: RegisterView, meta: { requiresAuth: false, hideForAuth: true } },
+  // Públicass
   { path: '/', name: 'home', component: HomeView, meta: { requiresAuth: false } },
   { path: '/explore', name: 'explore', component: ExploreView, meta: { requiresAuth: false } },
   { path: '/artwork/:id', name: 'artwork-detail', component: ArtworkDetail, props: true, meta: { requiresAuth: false } },
-  { path: '/login', name: 'login', component: LoginView, meta: { requiresAuth: false, hideForAuth: true } },
-  { path: '/register', name: 'register', component: RegisterView, meta: { requiresAuth: false, hideForAuth: true } },
-  { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
-  { path: '/my-profile', name: 'profile-edit', component: ProfileEdit, meta: { requireAuth: true } },
   { path: '/profile/:username', name: 'public-profile', component: PublicProfileView, meta: { requireAuth: false } },
   { path: '/collections', name: 'collections', component: CollectionsGallery, meta: { requireAuth: false } },
-  { path: '/my-collections', name: 'my-collections', component: MyCollectionsView, meta: { requiresAuth: true } },
   { path: '/collections/:id', name: 'CollectionDetail', component: CollectionDetail, meta: { requiresAuth: false } },
+  { path: '/community', name: 'community', component: CommunityView, meta: { requiresAuth: false } },
+  // Privadas
+  { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
+  { path: '/my-profile', name: 'profile-edit', component: ProfileEdit, meta: { requireAuth: true } },
+  { path: '/my-collections', name: 'my-collections', component: MyCollectionsView, meta: { requiresAuth: true } },
   { path: '/notifications', name: 'notifications', component: NotificationsView, meta: { requiresAuth: true } }
 ]
 

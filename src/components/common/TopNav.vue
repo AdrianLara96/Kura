@@ -201,6 +201,9 @@ onMounted(async () => {
         <router-link to="/collections" class="nav-link" :class="{ active: isActiveRoute('/collections') }">
           Colecciones
         </router-link>
+        <router-link to="/community" class="nav-link" :class="{ active: isActiveRoute('/community') }">
+          Comunidad
+        </router-link>
       </div>
 
       <!-- ============================================
@@ -463,6 +466,12 @@ onMounted(async () => {
             @click="mobileMenuOpen = false"
           >
             Colecciones
+          </router-link>
+          <router-link 
+            to="/community" 
+            class="mobile-nav-link" 
+            @click="mobileMenuOpen = false">
+            Comunidad
           </router-link>
           <router-link
             to="/dashboard"
