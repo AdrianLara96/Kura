@@ -30,12 +30,31 @@ const {
 } = useCommunity()
 
 // ============================================
+// CONSTANTES DE ICONOS (SVG paths)
+// ============================================
+
+const NOTIFICATION_ICONS = {
+  new_follower: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  new_comment: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  collection_liked: 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'
+}
+
+const NOTIFICATION_COLORS = {
+  new_follower: 'var(--kura-bright-teal)',
+  new_comment: 'var(--kura-gold)',
+  collection_liked: '#ff6b6b'
+}
+
+// ============================================
 // COMPUTED
 // ============================================
 
 const isLoggedIn = computed(() => !!currentUser.value)
 const hasUnreadNotifications = computed(() => unreadCount.value > 0)
 
+/**
+ * Verifica si la ruta actual coincide con la ruta dada
+ */
 const isActiveRoute = (path) => {
   return route.path === path || route.path.startsWith(path + '/')
 }
@@ -48,9 +67,12 @@ let notificationInterval = null
 let authSubscription = null
 
 // ============================================
-// MÉTODOS
+// MÉTODOS DE NAVEGACIÓN Y AUTH
 // ============================================
 
+/**
+ * Cierra sesión y redirige al home
+ */
 async function handleLogout() {
   await supabase.auth.signOut()
   userMenuOpen.value = false
@@ -58,6 +80,9 @@ async function handleLogout() {
   router.push('/')
 }
 
+/**
+ * Navega a una ruta y cierra todos los menús abiertos
+ */
 function navigateTo(path) {
   router.push(path)
   userMenuOpen.value = false
@@ -65,16 +90,29 @@ function navigateTo(path) {
   notificationsOpen.value = false
 }
 
+// ============================================
+// MÉTODOS DE UTILIDAD PARA USUARIO
+// ============================================
+
+/**
+ * Obtiene el nombre para mostrar del usuario (metadata o email)
+ */
 function getUserDisplayName() {
   return currentUser.value?.user_metadata?.display_name || 
          currentUser.value?.email?.split('@')[0] || 
          'Usuario'
 }
 
+/**
+ * Obtiene la URL del avatar del usuario o null si no tiene
+ */
 function getUserAvatar() {
   return currentUser.value?.user_metadata?.avatar_url || null
 }
 
+/**
+ * Formatea una fecha en formato relativo (Ahora, hace X min, hace X h, etc.)
+ */
 function formatDate(dateString) {
   const date = new Date(dateString)
   const now = new Date()
@@ -88,24 +126,27 @@ function formatDate(dateString) {
   return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
 }
 
+// ============================================
+// MÉTODOS DE NOTIFICACIONES
+// ============================================
+
+/**
+ * Obtiene el path SVG del icono según el tipo de notificación
+ */
 function getNotificationIcon(type) {
-  const icons = {
-    new_follower: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
-    new_comment: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
-    collection_liked: 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'
-  }
-  return icons[type] || icons.new_follower
+  return NOTIFICATION_ICONS[type] || NOTIFICATION_ICONS.new_follower
 }
 
+/**
+ * Obtiene el color del icono según el tipo de notificación
+ */
 function getIconColor(type) {
-  const colors = {
-    new_follower: 'var(--kura-bright-teal)',
-    new_comment: 'var(--kura-gold)',
-    collection_liked: '#ff6b6b'
-  }
-  return colors[type] || 'var(--text-muted)'
+  return NOTIFICATION_COLORS[type] || 'var(--text-muted)'
 }
 
+/**
+ * Maneja el click en una notificación: marca como leída y navega si hay link
+ */
 async function handleNotificationClick(notification) {
   if (!notification.is_read) {
     await markAsRead(notification.id)
@@ -116,6 +157,13 @@ async function handleNotificationClick(notification) {
   }
 }
 
+// ============================================
+// EVENT HANDLERS
+// ============================================
+
+/**
+ * Cierra los dropdowns si el click ocurre fuera de sus contenedores
+ */
 function handleClickOutside(event) {
   if (!event.target.closest('.user-menu-container')) {
     userMenuOpen.value = false
@@ -126,10 +174,12 @@ function handleClickOutside(event) {
 }
 
 // ============================================
-// CICLO DE VIDA (SIN AWAIT ANTES DE HOOKS)
+// CICLO DE VIDA
 // ============================================
 
-// Registrar cleanup PRIMERO (antes de cualquier await)
+/**
+ * Limpia listeners e intervals al desmontar el componente
+ */
 onUnmounted(() => {
   if (notificationInterval) {
     clearInterval(notificationInterval)
@@ -140,23 +190,25 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
+/**
+ * Inicializa el componente: carga usuario, notificaciones y listeners
+ */
 onMounted(async () => {
   // Obtener sesión inicial
-  const { data } = await supabase.auth.getSession()
-  currentUser.value = data?.session?.user || null
+  const {  session } = await supabase.auth.getSession()
+  currentUser.value = session?.user || null
 
-  // Si hay usuario, cargar notificaciones
+  // Si hay usuario, cargar notificaciones y configurar polling
   if (currentUser.value) {
     await fetchNotifications(50)
     
-    // Actualizar notificaciones cada 30 segundos
     notificationInterval = setInterval(async () => {
       await fetchNotifications(50)
     }, 30000)
   }
 
-  // Escuchar cambios de auth
-  const {  subscription } = supabase.auth.onAuthStateChange(
+  // Suscribirse a cambios de autenticación
+  const { subscription } = supabase.auth.onAuthStateChange(
     async (event, session) => {
       currentUser.value = session?.user || null
       
@@ -171,7 +223,7 @@ onMounted(async () => {
   
   authSubscription = subscription
 
-  // Listener para click outside
+  // Listener para cerrar dropdowns al hacer click fuera
   document.addEventListener('click', handleClickOutside)
 })
 </script>

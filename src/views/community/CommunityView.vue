@@ -131,15 +131,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useAuth } from '@/composables/useAuth'
 import TopNav from '@/components/common/TopNav.vue'
 import FollowButton from '@/components/common/FollowButton.vue'
 
+// ============================================
+// ROUTER Y COMPOSABLES
+// ============================================
+
 const router = useRouter()
 const { isLoggedIn, getDefaultAvatar } = useAuth()
+
+// ============================================
+// ESTADO REACTIVO
+// ============================================
 
 const users = ref([])
 const loading = ref(false)
@@ -148,6 +156,13 @@ const searchQuery = ref('')
 const userType = ref('')
 const currentUserId = ref(null)
 
+// ============================================
+// UTILIDADES
+// ============================================
+
+/**
+ * Convierte el tipo de usuario en etiqueta legible
+ */
 const getUserTypeLabel = (type) => {
   const labels = {
     enthusiast: 'Entusiasta',
@@ -157,21 +172,28 @@ const getUserTypeLabel = (type) => {
   return labels[type] || 'Usuario'
 }
 
+/**
+ * Navega al perfil público de un usuario
+ */
 const goToProfile = (username) => {
   router.push(`/profile/${username}`)
 }
 
+// ============================================
+// CARGA DE USUARIOS
+// ============================================
+
+/**
+ * Carga usuarios públicos con filtros y contadores
+ */
 const loadUsers = async () => {
   loading.value = true
   error.value = null
 
   try {
-    console.log('=== loadUsers START ===')
-
     // 1. Obtener usuario actual
     const {  authData } = await supabase.auth.getUser()
     currentUserId.value = authData?.user?.id || null
-    console.log('currentUserId:', currentUserId.value)
 
     // 2. Consulta base de usuarios públicos
     let query = supabase
@@ -187,15 +209,13 @@ const loadUsers = async () => {
       `)
       .eq('is_public', true)
 
-    // 3. Filtro por tipo
+    // 3. Filtro por tipo de usuario
     if (userType.value) {
-      console.log('Filtrando por tipo:', userType.value)
       query = query.eq('user_type', userType.value)
     }
 
     // 4. Búsqueda por nombre o username
     if (searchQuery.value.trim()) {
-      console.log('Búsqueda:', searchQuery.value)
       query = query.or(`display_name.ilike.%${searchQuery.value.trim()}%,username.ilike.%${searchQuery.value.trim()}%`)
     }
 
@@ -206,45 +226,31 @@ const loadUsers = async () => {
 
     query = query.limit(50)
 
-    console.log('Ejecutando consulta...')
     const { data: usersData, error: fetchError } = await query
 
-    console.log('usersData:', usersData)
-    console.log('fetchError:', fetchError)
-
-    if (fetchError) {
-      console.error('Error en fetch:', fetchError)
-      throw fetchError
-    }
+    if (fetchError) throw fetchError
 
     if (!usersData || usersData.length === 0) {
-      console.warn('No se encontraron usuarios públicos')
       users.value = []
       loading.value = false
       return
     }
 
-    // 6. Cargar contadores por separado
-    console.log('Cargando contadores para', usersData.length, 'usuarios...')
-    
+    // 6. Cargar contadores por separado (evita conflicto de relaciones)
     const usersWithCounts = await Promise.all(
       usersData.map(async (user) => {
         // Contar seguidores
-        const { count: followerCount, error: fError } = await supabase
+        const { count: followerCount } = await supabase
           .from('follows')
           .select('*', { count: 'exact', head: true })
           .eq('following_id', user.id)
 
-        if (fError) console.error('Error counting followers:', fError)
-
         // Contar colecciones públicas
-        const { count: collectionCount, error: cError } = await supabase
+        const { count: collectionCount } = await supabase
           .from('collections')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .eq('is_public', true)
-
-        if (cError) console.error('Error counting collections:', cError)
 
         return {
           ...user,
@@ -254,9 +260,7 @@ const loadUsers = async () => {
       })
     )
 
-    console.log('usersWithCounts:', usersWithCounts)
     users.value = usersWithCounts
-    console.log('=== loadUsers END ===')
 
   } catch (err) {
     error.value = err.message
@@ -266,7 +270,15 @@ const loadUsers = async () => {
   }
 }
 
+// ============================================
+// BÚSQUEDA Y FILTROS
+// ============================================
+
 let searchTimeout = null
+
+/**
+ * Búsqueda con debounce (500ms)
+ */
 const debouncedSearch = () => {
   if (searchTimeout) clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
@@ -274,11 +286,18 @@ const debouncedSearch = () => {
   }, 500)
 }
 
+/**
+ * Limpia filtros y recarga usuarios
+ */
 const clearSearch = () => {
   searchQuery.value = ''
   userType.value = ''
   loadUsers()
 }
+
+// ============================================
+// CICLO DE VIDA
+// ============================================
 
 onMounted(() => {
   loadUsers()

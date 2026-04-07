@@ -1,6 +1,9 @@
-// Composable para gestión de interacciones sociales: likes, comentarios, follows y notificaciones
+// ============================================
+// COMPOSABLE: useCommunity.js
+// ============================================
+// Gestión de interacciones sociales: likes, comentarios, follows y notificaciones
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { supabase } from '@/supabase/client'
 
 export function useCommunity() {
@@ -79,7 +82,7 @@ export function useCommunity() {
       loading.value = true
       error.value = null
 
-      // VERIFICAR si ya existe el like
+      // Verificar si ya existe el like
       const { data: existingLike } = await supabase
         .from('likes')
         .select('id')
@@ -107,12 +110,11 @@ export function useCommunity() {
         hasLiked.value = true
         likeCount.value = likeCount.value + 1
       }
+
       return { success: true }
     } catch (err) {
       error.value = err.message
       console.error('Error toggling like:', err)
-      // Al final de toggleLike, añade este log temporal:
-      console.log('toggleLike - collectionId:', collectionId, 'userId:', userId)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -191,10 +193,9 @@ export function useCommunity() {
 
       if (insertError) throw insertError
       
-      // Añadir al array local
       comments.value.push(data)
 
-      // TO-DO: Crear notificación para el dueño de la colección
+      // TODO: Crear notificación para el dueño de la colección
 
       return { success: true, data }
     } catch (err) {
@@ -221,7 +222,6 @@ export function useCommunity() {
 
       if (updateError) throw updateError
 
-      // Actualizar array local
       const index = comments.value.findIndex(c => c.id === commentId)
       if (index !== -1) {
         comments.value[index].content = content.trim()
@@ -253,7 +253,6 @@ export function useCommunity() {
 
       if (deleteError) throw deleteError
 
-      // Eliminar del array local
       comments.value = comments.value.filter(c => c.id !== commentId)
 
       return { success: true }
@@ -319,62 +318,60 @@ export function useCommunity() {
     }
   }
 
-    /**
-     * Seguir o dejar de seguir a un usuario
-     */
-    async function toggleFollow(targetUserId, currentUserId) {
+  /**
+   * Seguir o dejar de seguir a un usuario
+   */
+  async function toggleFollow(targetUserId, currentUserId) {
     try {
-        loading.value = true
-        error.value = null
+      loading.value = true
+      error.value = null
 
-        // PRIMERO: Verificar estado actual REAL en la BD
-        const { data: existingFollow } = await supabase
+      // Verificar estado actual real en la BD
+      const { data: existingFollow } = await supabase
         .from('follows')
         .select('id')
         .eq('follower_id', currentUserId)
         .eq('following_id', targetUserId)
         .maybeSingle()
 
-        const actuallyFollowing = !!existingFollow
+      const actuallyFollowing = !!existingFollow
 
-        if (actuallyFollowing) {
+      if (actuallyFollowing) {
         // Dejar de seguir (DELETE)
         const { error: deleteError } = await supabase
-            .from('follows')
-            .delete()
-            .eq('follower_id', currentUserId)
-            .eq('following_id', targetUserId)
+          .from('follows')
+          .delete()
+          .eq('follower_id', currentUserId)
+          .eq('following_id', targetUserId)
 
         if (deleteError) throw deleteError
         
-        // Actualizar estado local
         isFollowing.value = false
         followerCount.value = Math.max(0, followerCount.value - 1)
-        } else {
+      } else {
         // Seguir (INSERT)
         const { error: insertError } = await supabase
-            .from('follows')
-            .insert({
+          .from('follows')
+          .insert({
             follower_id: currentUserId,
             following_id: targetUserId
-            })
+          })
 
         if (insertError) throw insertError
         
-        // Actualizar estado local
         isFollowing.value = true
         followerCount.value = followerCount.value + 1
-        }
+      }
 
-        return { success: true }
+      return { success: true }
     } catch (err) {
-        error.value = err.message
-        console.error('Error toggling follow:', err)
-        return { success: false, error: err.message }
+      error.value = err.message
+      console.error('Error toggling follow:', err)
+      return { success: false, error: err.message }
     } finally {
-        loading.value = false
+      loading.value = false
     }
-    }
+  }
 
   // ============================================
   // NOTIFICACIONES
@@ -404,7 +401,6 @@ export function useCommunity() {
       if (fetchError) throw fetchError
       notifications.value = data || []
 
-      // Contar no leídas
       unreadCount.value = data?.filter(n => !n.is_read).length || 0
 
       return { success: true, data: notifications.value }
@@ -432,7 +428,6 @@ export function useCommunity() {
 
       if (updateError) throw updateError
 
-      // Actualizar array local
       const index = notifications.value.findIndex(n => n.id === notificationId)
       if (index !== -1) {
         notifications.value[index].is_read = true
@@ -471,7 +466,6 @@ export function useCommunity() {
 
       if (updateError) throw updateError
 
-      // Actualizar array local
       notifications.value = notifications.value.map(n => ({ ...n, is_read: true }))
       unreadCount.value = 0
 
@@ -489,6 +483,9 @@ export function useCommunity() {
   // RESET DE ESTADO
   // ============================================
 
+  /**
+   * Resetea todo el estado reactivo del composable
+   */
   function resetState() {
     likeCount.value = 0
     hasLiked.value = false
