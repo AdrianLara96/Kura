@@ -811,12 +811,223 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ---
 
-## 📊 Estado del Proyecto
+## Estado del Proyecto
 
 | Fase | Estado | Fecha Completado |
 |------|--------|------------------|
-| Fase 1: Foundation | ✅ Completada | 12/03/2026 |
-| Fase 2: Exploración | ✅ Completada | 14/03/2026 |
-| Fase 3: Colecciones | ✅ Completada | 18/03/2026 |
-| Fase 4: Comunidad | ✅ Completada | 21/03/2026 |
+| Fase 1: Foundation | Completada | 12/03/2026 |
+| Fase 2: Exploración | Completada | 14/03/2026 |
+| Fase 3: Colecciones | Completada | 18/03/2026 |
+| Fase 4: Comunidad | Completada | 21/03/2026 |
 
+---
+
+## [2026-03-21] FASE 4: COMUNIDAD - SESIÓN 2 (Limpieza + Documentación)
+
+**Fecha:** 21 de marzo de 2026  
+**Tipo:** Mantenimiento y documentación  
+
+---
+
+### Objetivos de la sesión
+
+- Eliminar logs de debug de componentes críticos
+- Añadir documentación JSDoc a funciones principales
+- Organizar código para mejor mantenibilidad
+- Actualizar documentación del proyecto
+- Resolver incidencia de Supabase (proyecto pausado)
+
+---
+
+### Cambios Técnicos Realizados
+
+#### Limpieza de Código
+
+| Archivo | Cambios |
+|---------|---------|
+| `useCommunity.js` | Eliminados `console.log` debug, añadidos JSDoc, corregida indentación en `toggleFollow` |
+| `TopNav.vue` | Centralizadas constantes de iconos (`NOTIFICATION_ICONS`, `NOTIFICATION_COLORS`), añadidos JSDoc a métodos |
+| `CommunityView.vue` | Eliminados ~15 logs de debug, añadidos JSDoc, simplificados `console.error` en contadores |
+
+#### Documentación
+
+| Archivo | Actualización |
+|---------|--------------|
+| `README.md` | Fecha actualizada, estado MVP + código optimizado, nota de últimas mejoras |
+| `PROYECTO.md` | Nueva entrada de bitácora, estado actualizado a "MVP Completo" |
+
+#### Infraestructura
+
+| Incidencia | Solución |
+|------------|----------|
+| Supabase proyecto pausado (`ERR_NAME_NOT_RESOLVED`) | Resume Project desde Dashboard de Supabase |
+
+---
+
+### Decisiones Técnicas
+
+1. **Documentación mínima viable:** JSDoc solo en funciones públicas/exportadas, no en helpers internos.
+2. **Logs de producción:** Mantener `console.error` en catch blocks para debugging en producción, eliminar `console.log` de desarrollo.
+3. **Constantes centralizadas:** Mover configuraciones repetidas (iconos, colores) a constantes al inicio del archivo para fácil mantenimiento.
+
+---
+
+### Pruebas Realizadas
+
+- [x] Recarga de aplicación sin errores en consola
+- [x] Navegación entre vistas funcional
+- [x] Interacciones sociales (like, follow, comment) funcionando
+- [x] Conexión con Supabase estable tras reactivación
+
+---
+
+### Archivos Modificados
+
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/composables/useCommunity.js` | Limpieza + documentación |
+| `src/components/common/TopNav.vue` | Limpieza + organización |
+| `src/views/community/CommunityView.vue` | Limpieza + documentación |
+| `README.md` | Documentación actualizada |
+| `PROYECTO.md` | Bitácora + estado actualizado |
+
+---
+
+### Notas
+
+- **Código listo para revisión:** Sin ruido en consola, documentado, estructurado.
+- **Supabase:** Recordar que proyectos Free Tier se pausan tras ~7 días de inactividad.
+- **Próximo paso recomendado:** Implementar triggers automáticos para notificaciones.
+
+---
+
+### Checklist de Sesión
+
+- [x] Eliminar todos los `console.log` de debug
+- [x] Añadir JSDoc a funciones públicas
+- [x] Centralizar constantes repetidas
+- [x] Verificar que no hay errores en consola
+- [x] Actualizar README.md y PROYECTO.md
+- [x] Commit final de limpieza
+- [x] Reactivar proyecto Supabase si estaba pausado
+
+---
+
+## [2026-03-21] FASE 4: COMUNIDAD - SESIÓN 3 (Triggers + Session Timeout)
+
+**Fecha:** 21 de marzo de 2026  
+**Tipo:** Implementación final + Seguridad  
+
+---
+
+### Objetivos de la sesión
+
+- Implementar triggers automáticos para notificaciones
+- Configurar cierre automático de sesión por inactividad (24h)
+- Testing final de todos los flujos de Fase 4
+- Preparar documentación para cierre de fase
+
+---
+
+### Cambios Técnicos Realizados
+
+#### Triggers de Notificaciones (Supabase)
+
+| Trigger | Tabla | Función | Tipo Notificación |
+|---------|-------|---------|-------------------|
+| `trigger_notify_collection_liked` | `likes` | `notify_collection_liked()` | `collection_liked` |
+| `trigger_notify_new_comment` | `comments` | `notify_new_comment()` | `new_comment` |
+| `trigger_notify_new_follower` | `follows` | `notify_new_follower()` | `new_follower` |
+
+**Características:**
+- Funciones SQL con `SECURITY DEFINER` para permisos
+- Se ejecutan `AFTER INSERT` en cada tabla
+- Insertan automáticamente en tabla `notifications`
+- Mensajes personalizados por tipo de interacción
+
+#### Session Timeout (Frontend)
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/composables/useSessionTimeout.js` | Monitor de inactividad (24h) |
+| `src/App.vue` | Integración del composable |
+
+**Funcionamiento:**
+- Detecta eventos de usuario (click, scroll, keypress, etc.)
+- Guarda timestamp en `localStorage` (persiste al cerrar navegador)
+- Verifica cada 60 segundos si hay inactividad
+- Cierra sesión y limpia storage al superar 24h
+
+---
+
+### Pruebas Realizadas
+
+- [x] Like → notificación automática generada
+- [x] Comentario → notificación automática generada
+- [x] Follow → notificación automática generada
+- [x] Session timeout con 10s (testing) → logout funciona
+- [x] Session timeout con 24h (producción) → configurado
+- [x] Recargar página → timestamp se restaura correctamente
+- [x] Logout manual → monitor se detiene, storage se limpia
+
+---
+
+### Archivos Creados
+
+| Archivo | Tipo | Líneas |
+|---------|------|--------|
+| `src/composables/useSessionTimeout.js` | Composable | ~150 |
+| Supabase Functions (3) | SQL Triggers | ~100 |
+
+### Archivos Modificados
+
+| Archivo | Cambios |
+|---------|---------|
+| `src/App.vue` | + Integración de useSessionTimeout |
+| `README.md` | + Sección de seguridad + notificaciones automáticas |
+| `PROYECTO.md` | + Entrada de bitácora + estado final |
+
+---
+
+### Decisiones Técnicas
+
+1. **Triggers en BD vs código frontend:**
+   - Triggers: Más consistente, menos código, escalable
+   - Frontend: Podría fallar si el usuario cierra antes de enviar
+
+2. **Session timeout en frontend (no Supabase):**
+   - Frontend: Gratis, personalizable, funciona en plan Free
+   - Supabase: Requiere plan Pro ($25/mes) para configurar duración
+
+3. **localStorage para persistencia:**
+   - Persiste al cerrar navegador
+   - Fácil de limpiar al hacer logout
+   - No es seguro para datos sensibles (solo timestamp)
+
+---
+
+### Notas
+
+- **Fase 4 oficialmente completada:** Todos los criterios del MVP están implementados
+- **Código en producción listo:** Sin logs de debug, documentado, testeado
+- **Seguridad mejorada:** Session timeout + RLS policies verificadas
+- **Próximo paso:** Fase 5 - Producción y Features Post-MVP
+
+---
+
+### Checklist de Cierre de Fase 4
+
+- [x] Likes funcionales con contador
+- [x] Comentarios CRUD completos
+- [x] Follows con contadores
+- [x] Notificaciones (bandeja + badge + triggers automáticos)
+- [x] PublicProfileView con seguidores/seguidos
+- [x] CommunityView funcional
+- [x] Código limpio (sin debug logs)
+- [x] Documentación JSDoc en composables
+- [x] README.md actualizado
+- [x] PROYECTO.md con bitácora completa
+- [x] Session timeout (24h) implementado
+- [x] Triggers automáticos de notificaciones
+- [x] Supabase conectado y estable
+- [x] Testing E2E de flujos sociales

@@ -172,6 +172,36 @@ Este proyecto sirve como base para el aprendizaje de arquitecturas web modernas 
 
 ---
 
+## Características de Seguridad
+
+### Sesión Automática (24h)
+
+La aplicación implementa un sistema de cierre automático de sesión por inactividad:
+
+- **Duración:** 24 horas sin actividad
+- **Detección:** Monitoriza interacciones del usuario (click, scroll, teclado)
+- **Persistencia:** Funciona incluso cerrando el navegador (localStorage)
+- **Logout automático:** Al superar el límite, se cierra sesión y redirige al home
+
+---
+
+## Notificaciones Automáticas
+
+El sistema genera notificaciones automáticamente mediante triggers de base de datos:
+
+| Evento | Trigger | Notificación |
+|--------|---------|--------------|
+| Like en colección | `trigger_notify_collection_liked` | `collection_liked` |
+| Comentario en colección | `trigger_notify_new_comment` | `new_comment` |
+| Nuevo seguidor | `trigger_notify_new_follower` | `new_follower` |
+
+**Ventajas:**
+- Sin código extra en el frontend
+- Consistencia garantizada
+- Escalable a cualquier número de usuarios
+
+---
+
 ## Licencia y Créditos
 
 Los datos de las obras de arte pertenecen a The Metropolitan Museum of Art y se distribuyen bajo su política de uso de datos (generalmente dominio público o Creative Commons Zero para imágenes). El código de la plataforma está disponible bajo licencia abierta para fines educativos y de desarrollo.
@@ -191,4 +221,4 @@ Hemos completado el roadmap inicial de 4 fases y el proyecto está listo para:
 
 
 **Desarrollador Principal:** Adrian Lara  
-**Fecha de última actualización:** 20 de Marzo de 2026
+**Fecha de última actualización:** 10 de abril de 2026
