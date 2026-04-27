@@ -1,49 +1,68 @@
+// src/composables/useArtworks.js
 
 import { ref } from 'vue'
-import { searchArtworks, getArtworkById, getFeaturedArtworks } from '@/services/museumApi'
+import { searchArtworks, getArtworkById, getFeaturedArtworks, getDepartments } from '@/services/museumApi'
 
 export function useArtworks() {
-  // Estado reactivo
+  // Estado reactivo - Obras y carga
   const artworks = ref([])
   const loading = ref(false)
   const error = ref(null)
+  
+  // Estado reactivo - Paginación
   const pagination = ref({ 
     page: 1, 
     total: 0, 
     totalPages: 1, 
-    limit: 20 
+    pageSize: 12 // Default: 12 items por página
   })
   
-  // Parámetros de búsqueda actuales (para reutilizar)
+  // Estado reactivo - Filtros
+  const filters = ref({
+    query: '',
+    departmentIds: [], // Array de IDs seleccionados
+    hasImages: true
+  })
+  
+  // Parámetros de búsqueda actuales
   const currentSearchParams = ref({})
 
   /**
    * Busca obras con los parámetros especificados
-   * @param {Object} params - { query, limit, department, hasImages }
+   * @param {Object} params - { query, departmentIds, hasImages, page, pageSize }
    */
   const search = async (params = {}) => {
     loading.value = true
     error.value = null
     
     try {
-      // Guardar parámetros actuales por si queremos recargar
-      currentSearchParams.value = { ...params }
+      // Fusionar parámetros recibidos con los actuales y valores por defecto
+      const searchParams = {
+        query: params.query ?? filters.value.query,
+        departmentIds: params.departmentIds ?? filters.value.departmentIds,
+        hasImages: params.hasImages ?? filters.value.hasImages,
+        page: params.page ?? pagination.value.page,
+        pageSize: params.pageSize ?? pagination.value.pageSize
+      }
       
-      const result = await searchArtworks({
-        query: params.query || '',
-        limit: params.limit || 20,
-        department: params.department || '',
-        hasImages: params.hasImages !== false // true por defecto
-      })
+      // Guardar parámetros actuales por si queremos recargar
+      currentSearchParams.value = { ...searchParams }
+      
+      // Actualizar estado reactivo de filtros (para que la UI se sincronice)
+      filters.value.query = searchParams.query
+      filters.value.departmentIds = searchParams.departmentIds
+      filters.value.hasImages = searchParams.hasImages
+      pagination.value.page = searchParams.page
+      pagination.value.pageSize = searchParams.pageSize
+      
+      const result = await searchArtworks(searchParams)
       
       // Actualizar estado reactivo
-      // IMPORTANTE: Usar spread operator ([...]) para forzar reactividad en Vue 3
       artworks.value = [...result.results]
       pagination.value.total = result.total || artworks.value.length
       pagination.value.totalPages = result.totalPages || 1
-      pagination.value.page = result.page || 1
       
-      console.log(`Búsqueda completada: ${artworks.value.length} obras encontradas`)
+      console.log(`Búsqueda completada: ${artworks.value.length} obras encontradas (página ${pagination.value.page})`)
       
       return { 
         success: true, 
@@ -91,7 +110,6 @@ export function useArtworks() {
 
   /**
    * Obtiene obras destacadas para la home
-   * Esta función usa el endpoint que filtra por isHighlight=true
    * @param {number} limit - Cantidad de obras
    */
   const getFeatured = async (limit = 12) => {
@@ -126,6 +144,57 @@ export function useArtworks() {
   }
 
   /**
+   * Navega a una página específica y recarga los resultados
+   * @param {number} page - Número de página (1-based)
+   */
+  const goToPage = async (page) => {
+    // Validar que la página esté dentro del rango válido
+    if (page < 1 || page > pagination.value.totalPages) {
+      console.warn(`Página ${page} fuera de rango (1-${pagination.value.totalPages})`)
+      return false
+    }
+    
+    // Actualizar página actual y recargar búsqueda con mismos parámetros
+    pagination.value.page = page
+    return await search({ page })
+  }
+
+  /**
+   * Actualiza el filtro de departamento y resetea a página 1
+   * @param {Array<number>} departmentIds - Array de IDs de departamento a filtrar
+   */
+  const setDepartmentFilter = async (departmentIds) => {
+    // Asegurar que siempre es un array
+    const ids = Array.isArray(departmentIds) ? departmentIds : (departmentIds ? [departmentIds] : [])
+    
+    // Actualizar filtro y resetear paginación
+    filters.value.departmentIds = ids
+    pagination.value.page = 1 // Siempre volvemos a la página 1 al cambiar filtros
+    
+    // Recargar búsqueda con nuevo filtro
+    return await search({ departmentIds: ids, page: 1 })
+  }
+
+  /**
+   * Limpia todos los filtros y recarga la búsqueda
+   */
+  const resetFilters = async () => {
+    filters.value = {
+      query: '',
+      departmentIds: [],
+      hasImages: true
+    }
+    pagination.value.page = 1
+    
+    // Recargar con filtros limpios
+    return await search({ 
+      query: '', 
+      departmentIds: [], 
+      page: 1 
+    })
+  }
+
+  /**
    * Recarga la búsqueda con los últimos parámetros usados
    * Útil para botón "reintentar" después de un error
    */
@@ -145,7 +214,12 @@ export function useArtworks() {
       page: 1, 
       total: 0, 
       totalPages: 1, 
-      limit: 20 
+      pageSize: 12 
+    }
+    filters.value = {
+      query: '',
+      departmentIds: [],
+      hasImages: true
     }
     error.value = null
     currentSearchParams.value = {}
@@ -158,19 +232,40 @@ export function useArtworks() {
     error.value = null
   }
 
+  /**
+   * Obtiene la lista de departamentos disponibles para filtros
+   * @returns {Array} Array de objetos { id, name }
+   */
+  const getAvailableDepartments = () => {
+    return getDepartments()
+  }
+
   return {
-    // Estado
+    // Estado - Obras y carga
     artworks,
     loading,
     error,
+    
+    // Estado - Paginación
     pagination,
     
-    // Acciones
+    // Estado - Filtros
+    filters,
+    
+    // Acciones - Búsqueda y navegación
     search,
     getArtwork,
     getFeatured,
+    goToPage,
     reload,
+    
+    // Acciones - Filtros
+    setDepartmentFilter,
+    resetFilters,
+    
+    // Acciones - Utilidades
     reset,
-    clearError
+    clearError,
+    getAvailableDepartments
   }
 }

@@ -38,7 +38,15 @@ const {
 
 const { 
   loading: communityLoading, 
-  error: communityError 
+  error: communityError, 
+  // Estados reactivos de las interacciones
+  hasLiked,
+  likeCount,
+  isFollowing,
+  followerCount,
+  // Funciones para consultar estado real
+  fetchLikeStatus,
+  fetchFollowStatus
 } = useCommunity()
 
 // ============================================
@@ -113,6 +121,15 @@ onMounted(async () => {
       if (!isOwner.value) {
         await incrementViewCount()
       }
+
+      // Consultar estado de likes y follows
+      if (currentUser.value) {
+        await fetchLikeStatus(currentCollection.value.id)
+        await fetchFollowStatus(collectionOwnerId.value)
+        // Debug (borrar despuéss)
+        console.log('After fetch - hasLiked:', hasLiked.value, 'likeCount:', likeCount.value)
+        console.log('After fetch - isFollowing:', isFollowing.value, 'followersCount:', followerCount.value)
+      }
     }
   }
 })
@@ -126,10 +143,16 @@ onMounted(async () => {
  */
 async function incrementViewCount() {
   try {
-    const { error } = await supabase
-      .from('collections')
-      .update({ view_count: viewCount.value + 1 })
-      .eq('id', route.params.id)
+    // Opción A: UPDATE directo (me da error en la actualización)
+    // const { error } = await supabase
+      // .from('collections')
+      // .update({ view_count: viewCount.value + 1 })
+      // .eq('id', route.params.id)
+
+    // Opción B: Función RPC (alternativa sin modificar RLS)
+    const { error } = await supabase.rpc('increment_collection_view', {
+      collection_id: route.params.id
+    })
 
     if (!error) {
       viewCount.value = viewCount.value + 1
@@ -147,19 +170,41 @@ function navigateToProfile(username) {
 }
 
 /**
- * Maneja el cambio de like
+ * Maneja el cambio de like y actualiza estado local
  */
 function handleLikeChanged(data) {
-  console.log('Like changed:', data)
-  // El LikeButton ya actualiza su estado internamente
+  // Por seguridad, sincronizamos con los valores recibidos
+  if (data.count !== undefined) {
+    likeCount.value = data.count
+  }
+  if (data.liked !== undefined) {
+    hasLiked.value = data.liked
+  }
+  console.log('Like updated:', { liked: hasLiked.value, count: likeCount.value })
+  console.log('handleLikeChanged - data:', data)                                                // debug
+  console.log('handleLikeChanged - hasLiked:', hasLiked.value, 'likeCount:', likeCount.value)   // debug
 }
 
 /**
- * Maneja el cambio de follow
+ * Maneja el cambio de follow y actualiza estado local
  */
 function handleFollowChanged(data) {
-  console.log('Follow changed:', data)
-  // El FollowButton ya actualiza su estado internamente
+  //debug:
+  console.log('=== handleFollowChanged DEBUG ===')
+  console.log('data recibido:', data)
+  console.log('followerCount (del composable):', followerCount?.value)
+  console.log('isFollowing (del composable):', isFollowing?.value)
+
+  // Sincronizar con valores recibidos
+  if (data.followersCount !== undefined) {
+    followerCount.value = data.followersCount
+  }
+  if (data.following !== undefined) {
+    isFollowing.value = data.following
+  }
+  console.log('Follow updated:', { following: isFollowing.value, count: followerCount.value })
+  console.log('handleFollowChanged - data:', data)                                                                // debug
+  console.log('handleFollowChanged - isFollowing:', isFollowing.value, 'followerCount:', followerCount.value)     // debug
 }
 
 /**
@@ -312,8 +357,8 @@ async function handleDeleteCollection() {
               <!-- Like Button -->
               <LikeButton
                 :collectionId="currentCollection.id"
-                :initialCount="currentCollection.like_count || 0"
-                :initialLiked="false"
+                :initialCount="likeCount"
+                :initialLiked="hasLiked"
                 size="lg"
                 @like-changed="handleLikeChanged"
               />
@@ -322,12 +367,16 @@ async function handleDeleteCollection() {
               <FollowButton
                 v-if="!isOwner && collectionOwnerId"
                 :targetUserId="collectionOwnerId"
-                :initialFollowersCount="0"
-                :initialFollowing="false"
+                :initialFollowersCount="followerCount"
+                :initialFollowing="isFollowing"
                 size="md"
                 variant="default"
                 @follow-changed="handleFollowChanged"
               />
+              <!-- Debug temporal -->
+              <div style="font-size: 10px; color: red;">
+                Debug: followerCount={{ followerCount }}, isFollowing={{ isFollowing }}
+              </div>
             </div>
 
             <!-- Acciones para el dueño -->

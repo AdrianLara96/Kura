@@ -68,11 +68,11 @@
               <!-- Contadores de seguidores/seguidos -->
               <div class="follow-stats">
                 <div class="stat-item">
-                  <span class="stat-number">{{ followerCount }}</span>
+                  <span class="stat-number">{{ localFollowerCount }}</span>
                   <span class="stat-label">Seguidores</span>
                 </div>
                 <div class="stat-item">
-                  <span class="stat-number">{{ followingCount }}</span>
+                  <span class="stat-number">{{ localFollowingCount }}</span>
                   <span class="stat-label">Siguiendo</span>
                 </div>
               </div>
@@ -104,6 +104,7 @@
                   :initialFollowing="false"
                   size="lg"
                   variant="default"
+                  @follow-changed="handleFollowChanged"
                 />
               </div>
 
@@ -207,6 +208,8 @@ const profile = ref(null)
 const collections = ref([])
 const activeTab = ref('collections')
 const currentUserId = ref(null)
+const localFollowerCount = ref(0)
+const localFollowingCount = ref(0)
 
 // Mapeo de tipos de usuario a etiquetas legibles
 const getUserTypeLabel = (type) => {
@@ -232,6 +235,14 @@ const goToCollection = (id) => {
   router.push(`/collections/${id}`)
 }
 
+/**
+ * Maneja el cambio de follow y actualiza el contador
+ */
+function handleFollowChanged(data) {
+  // Actualizar el contador local
+  localFollowerCount.value = data.followersCount
+}
+
 onMounted(async () => {
   try {
     // Obtener usuario actual
@@ -249,7 +260,14 @@ onMounted(async () => {
           description,
           cover_image_url,
           is_public,
-          collection_items (id)
+          collection_items (
+          id,
+          museum_artworks (
+            id,
+            thumbnail_url,
+            image_url
+            )
+          )
         )
       `)
       .eq('username', username.value)
@@ -268,6 +286,8 @@ onMounted(async () => {
     // Cargar estado de follows
     if (profileData.id) {
       await fetchFollowStatus(profileData.id)
+      localFollowerCount.value = followerCount
+      localFollowingCount.value = followingCount
     }
 
   } catch (err) {

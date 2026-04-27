@@ -1,8 +1,43 @@
+// src/services/museumApi.js
 
 const MET_BASE_URL = 'https://collectionapi.metmuseum.org/public/collection/v1';
 const REQUEST_TIMEOUT = 10000; // 10 segundos
 const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000; // 1 segundo base para backoff
+
+/**
+ * Lista de departamentos más populares del Met
+ * Evitamos petición extra a /departments al cargar
+ * Fuente: https://collectionapi.metmuseum.org/public/collection/v1/departments
+ */
+export const POPULAR_DEPARTMENTS = [
+  { id: 1, name: 'Egyptian Art' },
+  { id: 3, name: 'Arms and Armor' },
+  { id: 4, name: 'Arts of Africa, Oceania, and the Americas' },
+  { id: 5, name: 'Asian Art' },
+  { id: 9, name: 'Costume Institute' },
+  { id: 10, name: 'Drawings and Prints' },
+  { id: 12, name: 'European Paintings' },
+  { id: 13, name: 'European Sculpture and Decorative Arts' },
+  { id: 19, name: 'Greek and Roman Art' },
+  { id: 21, name: 'Islamic Art' }
+];
+
+/**
+ * Sugerencias de búsqueda comunes para mostrar cuando la API falla
+ */
+export const SEARCH_SUGGESTIONS = [
+  'Van Gogh',
+  'Monet',
+  'Rembrandt',
+  'Flowers',
+  'Portraits',
+  'Landscapes',
+  'Egyptian Art',
+  'Greek Sculpture',
+  'Impressionism',
+  'Still Life'
+];
 
 /**
  * Helper para esperar X milisegundos
@@ -32,9 +67,9 @@ async function fetchWithRetry(url, retries = MAX_RETRIES) {
       }
     });
 
-    // 404: La obra no existe, retornamos null (no es error crítico)
+    // 404: La obra no existe, retornamos null
     if (response.status === 404) {
-      console.log(`⚠️ 404 - Recurso no encontrado: ${url}`);
+      console.log(`404 - Recurso no encontrado: ${url}`);
       return null;
     }
 
@@ -64,10 +99,10 @@ async function fetchWithRetry(url, retries = MAX_RETRIES) {
 
 /**
  * Normaliza una obra de la API del Met a nuestro esquema Kura
- * Retorna null si la obra no tiene imagen (la filtramos)
+ * Retorna null si la obra no tiene imagen
  */
 export function normalizeMetArtwork(metData) {
-  // FILTRO: Sin imagen = no la mostramos
+  // FILTRO: Sin imagen => no la mostramos
   if (!metData || !metData.primaryImage || metData.primaryImage.trim() === '') {
     return null;
   }
@@ -140,26 +175,39 @@ export function normalizeMetArtwork(metData) {
 }
 
 /**
- * Busca obras en la API del Met
- * @param {Object} params - { query, limit, department, hasImages }
- * @returns {Object} { results, total, page, totalPages }
+ * Obtiene la lista de departamentos populares para filtros
+ * @returns {Array} Array de objetos { id, name }
+ */
+export function getDepartments() {
+  return POPULAR_DEPARTMENTS;
+}
+
+/**
+ * Busca obras en la API del Met con soporte para filtros y paginación
+ * @param {Object} params - { query, departmentIds, hasImages, page, pageSize }
+ * @returns {Object} { results, total, page, totalPages, pageSize, errorType? }
  */
 export async function searchArtworks({ 
   query = '', 
-  limit = 20, 
-  department = '',
-  hasImages = true 
+  departmentIds = [], // Array de IDs de departamento, ej: [1, 12]
+  hasImages = true,
+  page = 1,
+  pageSize = 12 // 12 items por página
 } = {}) {
   try {
-    // >> Paso 1: Obtener IDs de obras que coincidan con la búsqueda
+    // >> Construir parámetros de búsqueda para el endpoint /search
     const searchParams = new URLSearchParams();
     
     if (query.trim()) {
       searchParams.append('q', query.trim());
     }
     
-    if (department) {
-      searchParams.append('department', department);
+    // Filtro por departamento: la API del Met usa 'departmentId' (singular) en /search
+    // Si hay múltiples, la API solo acepta uno en /search, así que usamos el primero
+    if (Array.isArray(departmentIds) && departmentIds.length > 0) {
+      searchParams.append('departmentId', departmentIds[0].toString());
+    } else if (typeof departmentIds === 'string' && departmentIds.trim()) {
+      searchParams.append('departmentId', departmentIds.trim());
     }
     
     if (hasImages) {
@@ -168,66 +216,102 @@ export async function searchArtworks({
 
     const searchUrl = `${MET_BASE_URL}/search?${searchParams.toString()}`;
     console.log('Buscando en Met API:', searchUrl);
-
-    // DEBUG - Borrar después
-    console.log('🔍 [DEBUG museumApi] Parámetros recibidos:', { query, limit, department, hasImages })
     
     const searchData = await fetchWithRetry(searchUrl);
     
     // La API devuelve { total, objectIDs }
     const allObjectIDs = searchData?.objectIDs || [];
     
-    // >> Paso 2: Si no hay resultados, retornar vacío
+    // >> Si no hay resultados, retornar vacío
     if (allObjectIDs.length === 0) {
       return {
         results: [],
         total: 0,
         page: 1,
-        totalPages: 0
+        totalPages: 0,
+        pageSize
       };
     }
 
-    // >> Paso 3: Limitar cantidad de IDs a procesar
-    const limitedIDs = allObjectIDs.slice(0, limit * 2); // Pedimos más para filtrar sin imagen
+    // >> Paginación manual (la API no tiene paginación nativa)
+    // Calculamos el índice de inicio y fin para esta página
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
     
-    // >> Paso 4: Obtener detalles de cada obra (peticiones paralelas con manejo individual de errores)
-    const detailPromises = limitedIDs.map(async (id) => {
+    // Slice de los IDs para esta página
+    const pageObjectIDs = allObjectIDs.slice(startIndex, endIndex);
+    
+    // Si no hay IDs en esta página, retornar vacío
+    if (pageObjectIDs.length === 0) {
+      return {
+        results: [],
+        total: searchData.total || allObjectIDs.length,
+        page,
+        totalPages: Math.ceil(allObjectIDs.length / pageSize),
+        pageSize
+      };
+    }
+
+    // >> Obtener detalles de cada obra de esta página
+    const detailPromises = pageObjectIDs.map(async (id) => {
       try {
         const data = await fetchWithRetry(`${MET_BASE_URL}/objects/${id}`);
         return data ? normalizeMetArtwork(data) : null;
       } catch (err) {
-        console.warn(`Error obteniendo obra ${id}:`, err.message);
+        console.warn(`⚠️ Error obteniendo obra ${id}:`, err.message);
         return null;
       }
     });
 
     const allArtworks = await Promise.all(detailPromises);
     
-    // >> Paso 5: Filtrar obras null (sin imagen o con error)
+    // >> Filtrar obras null (sin imagen o con error)
     const validArtworks = allArtworks.filter(artwork => artwork !== null);
-    
-    // >> Paso 6: Recortar al límite solicitado
-    const results = validArtworks.slice(0, limit);
+
+    // >> Calcular totales reales (ajustados por obras filtradas sin imagen)
+    // Nota: El total real puede ser menor que searchData.total porque filtramos sin imagen
+    const estimatedTotal = searchData.total || allObjectIDs.length;
+    const adjustedTotal = Math.max(estimatedTotal - (allObjectIDs.length - validArtworks.length), 0);
 
     return {
-      results,
-      total: searchData.total || results.length,
-      page: 1,
-      totalPages: Math.ceil((searchData.total || results.length) / limit)
+      results: validArtworks,
+      total: adjustedTotal,
+      page,
+      totalPages: Math.ceil(adjustedTotal / pageSize),
+      pageSize
     };
 
   } catch (err) {
     console.error('Error en searchArtworks:', err);
-    
-    // Mensaje más amigable según el tipo de error
+
+    // Clasificar el tipo de error para mostrar mensajes específicos
+    let errorType = 'unknown';
     let userMessage = 'No se pudo conectar con The Met API';
+
     if (err.name === 'AbortError') {
+      errorType = 'timeout';
       userMessage = 'La petición tardó demasiado. Por favor, inténtalo de nuevo.';
     } else if (err.message?.includes('502')) {
+      errorType = 'server-unavailable';
       userMessage = 'El servidor del museo está temporalmente indisponible. Intenta en unos minutos.';
+    } else if (err.message?.includes('404')) {
+      errorType = 'not-found';
+      userMessage = 'No se encontró el recurso solicitado.'; 
+    } else if (err.message?.includes('CORS') || err.message?.includes('NetworkError')) {
+      errorType = 'connection';
+      userMessage = 'No se pudo establecer conexión con The Met API. Verifica tu conexión a internet.';
+    } else if (departmentIds?.length > 0) {
+      // Error específico cuando se usa filtro de departamento
+      errorType = 'filter-unavailable';
+      userMessage = 'El filtro por departamento no está disponible en este momento. Prueba con una búsqueda por texto.';
     }
     
-    throw new Error(userMessage);
+    // Retornar objeto con información del error para que la UI lo maneje
+    throw {
+      message: userMessage,
+      errorType,
+      originalError: err
+    };
   }
 }
 
