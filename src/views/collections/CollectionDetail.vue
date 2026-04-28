@@ -373,10 +373,6 @@ async function handleDeleteCollection() {
                 variant="default"
                 @follow-changed="handleFollowChanged"
               />
-              <!-- Debug temporal -->
-              <div style="font-size: 10px; color: red;">
-                Debug: followerCount={{ followerCount }}, isFollowing={{ isFollowing }}
-              </div>
             </div>
 
             <!-- Acciones para el dueño -->
