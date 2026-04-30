@@ -57,6 +57,7 @@ const currentUser = ref(null)
 const collectionOwnerId = ref(null)
 const viewCount = ref(0)
 const isOwner = ref(false)
+const statusLoaded = ref(false) 
 
 // ============================================
 // COMPUTED
@@ -102,7 +103,7 @@ const formatDate = (dateString) => {
 
 onMounted(async () => {
   // Obtener usuario actual
-  const { data: { session } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
   currentUser.value = session?.user || null
 
   // Cargar colección
@@ -126,9 +127,13 @@ onMounted(async () => {
       if (currentUser.value) {
         await fetchLikeStatus(currentCollection.value.id)
         await fetchFollowStatus(collectionOwnerId.value)
-        // Debug (borrar despuéss)
+
+        // Debug (borrar después)
         console.log('After fetch - hasLiked:', hasLiked.value, 'likeCount:', likeCount.value)
         console.log('After fetch - isFollowing:', isFollowing.value, 'followersCount:', followerCount.value)
+
+        // Indicamos que el estado ya está cargado
+        statusLoaded.value = true
       }
     }
   }
@@ -354,8 +359,9 @@ async function handleDeleteCollection() {
 
             <!-- Acciones sociales -->
             <div class="collection-actions">
-              <!-- Like Button -->
+              <!-- Like Button: Solo renderizar cuando el estado esté cargado -->
               <LikeButton
+                v-if="statusLoaded" 
                 :collectionId="currentCollection.id"
                 :initialCount="likeCount"
                 :initialLiked="hasLiked"
@@ -363,9 +369,9 @@ async function handleDeleteCollection() {
                 @like-changed="handleLikeChanged"
               />
 
-              <!-- Follow Button (solo si no es el dueño) -->
+              <!-- Follow Button -->
               <FollowButton
-                v-if="!isOwner && collectionOwnerId"
+                v-if="!isOwner && collectionOwnerId && statusLoaded"
                 :targetUserId="collectionOwnerId"
                 :initialFollowersCount="followerCount"
                 :initialFollowing="isFollowing"

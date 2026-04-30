@@ -1,4 +1,7 @@
-<!-- Botón reutilizable para dar/quitar like a colecciones -->
+<!-- 
+  /components/common/LikeButton.vue
+  Botón reutilizable para dar/quitar like a colecciones 
+-->
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -59,12 +62,16 @@ onMounted(async () => {
   const { data } = await supabase.auth.getUser()
   currentUser.value = data?.user || null
   
-  // Debug temporal (puedes borrarlo después)
+  // Debug temporal
   console.log('LikeButton - currentUser:', currentUser.value)
   
-  // Inicializar estado local con las props
-  likeCount.value = props.initialCount
-  hasLiked.value = props.initialLiked
+  // Solo inicializar si el composable aún tiene valores por defecto
+  if (likeCount.value === 0 && props.initialCount > 0) {
+    likeCount.value = props.initialCount
+  }
+  if (!hasLiked.value && props.initialLiked) {
+    hasLiked.value = props.initialLiked
+  }
 })
 
 // ============================================

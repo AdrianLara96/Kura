@@ -1,4 +1,7 @@
-<!-- Botón reutilizable para seguir/dejar de seguir usuarios -->
+<!-- 
+  /components/common/FollowButton.vue
+  Botón reutilizable para seguir/dejar de seguir usuarios 
+--> 
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -61,14 +64,17 @@ const errorMessage = ref('')
 // ============================================
 
 onMounted(async () => {
-  // 1. Obtener usuario actual
+  // Obtener usuario actual
   const { data } = await supabase.auth.getUser()
   currentUser.value = data?.user || null
 
-  // 2. Inicializar estado local FORZANDO la reactividad
-  // Aseguramos que los valores iniciales se apliquen aunque el composable tarde
-  followerCount.value = props.initialFollowersCount
-  isFollowing.value = props.initialFollowing
+  // Solo inicializar si el composable aún tiene valores por defecto
+  if (followerCount.value === 0 && props.initialFollowersCount > 0) {
+    followerCount.value = props.initialFollowersCount
+  }
+  if (!isFollowing.value && props.initialFollowing) {
+    isFollowing.value = props.initialFollowing
+  }
 })
 
 // ============================================
