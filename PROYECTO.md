@@ -2,7 +2,7 @@
 
 ---
 
-**Estado:** Proyecto iniciado
+**Estado:** MVP Completado
 
 **Concepto:** Plataforma de descubrimiento cultural que conecta obras maestras de museos internacionales con colecciones temáticas creadas por usuarios.
 
@@ -202,7 +202,7 @@ src/
 │ ├── useArtworks.js
 │ ├── useAuth.js
 │ ├── useCollections.js
-│ └── useCommunity.js          # NUEVO - Fase 4
+│ └── useCommunity.js
 │
 ├── views/
 │ ├── auth/
@@ -221,7 +221,7 @@ src/
 │ │ ├── ProfileEdit.vue
 │ │ └── PublicProfileView.vue
 │ ├── notifications/
-│ │ └── NotificationsView.vue  # NUEVO - Fase 4
+│ │ └── NotificationsView.vue
 │ └── HomeView.vue
 │
 ├── components/
@@ -230,11 +230,11 @@ src/
 │ │ ├── CollectionCard.vue
 │ │ └── CollectionForm.vue
 │ ├── comments/
-│ │ └── CommentsSection.vue    # NUEVO - Fase 4
+│ │ └── CommentsSection.vue
 │ └── common/
 │ │ ├── TopNav.vue
-│ │ ├── LikeButton.vue         # NUEVO - Fase 4
-│ │ └── FollowButton.vue       # NUEVO - Fase 4
+│ │ ├── LikeButton.vue
+│ │ └── FollowButton.vue
 │
 ├── router/
 │ └── index.js
@@ -256,9 +256,9 @@ src/
 
 ### 🔌 APIs de Museos
 
-| Museo              | URL                              | Key         | Obras      |
-| ------------------ | -------------------------------- | ----------- | ---------- |
-| The Met 🇺🇸         | collectionapi.metmuseum.org      | No          | 490,000+   |
+| Museo      | URL                         | Key | Obras    |
+| ---------- | --------------------------- | --- | -------- |
+| The Met 🇺🇸 | collectionapi.metmuseum.org | No  | 490,000+ |
 
 ---
 
@@ -280,7 +280,7 @@ De momento, ninguna.
 - Auth completo (login, registro, logout)
 - Perfiles de usuario editables
 - Integración API
-- Sincronización con cache (7 días)
+- Sincronización con cache
 - Router protegido
 
 **Criterio de completado:**
@@ -290,7 +290,7 @@ De momento, ninguna.
 - [x] Se pueden fetchear obras
 - [x] Las obras se guardan en cache en tu BD
 
-#### Fase 2: Exploración
+#### Fase 2: Exploration
 
 - Grid de obras responsive
 - Filtros por museo, período, artista
@@ -304,7 +304,7 @@ De momento, ninguna.
 - [x] Grid de obras responsive
 - [x] Detalle de obra muestra toda la información
 
-#### Fase 3: Colecciones
+#### Fase 3: Colecctions
 
 - Crear colección (título, descripción, portada)
 - Añadir obras desde explorador
@@ -319,7 +319,7 @@ De momento, ninguna.
 - [x] Ver colección propia y pública
 - [x] Editar/eliminar colecciones propias
 
-#### Fase 4: Comunidad
+#### Fase 4: Comumunity
 
 - Likes en colecciones
 - Comentarios en colecciones
@@ -329,10 +329,10 @@ De momento, ninguna.
 
 **Criterio de completado:**
 
-- [X] Dar like a colecciones
-- [X] Comentar en colecciones
-- [X] Seguir/dejar de seguir usuarios
-- [X] Recibir notificaciones cuando alguien interactúa contigo
+- [x] Dar like a colecciones
+- [x] Comentar en colecciones
+- [x] Seguir/dejar de seguir usuarios
+- [x] Recibir notificaciones cuando alguien interactúa contigo
 
 ---
 
@@ -355,15 +355,12 @@ De momento, ninguna.
 
 ### Enlaces de Referencia
 
-| Recurso                | URL                                              |
-| ---------------------- | ------------------------------------------------ |
-| Documentación Vue 3    | https://vuejs.org/                               |
-| Documentación Supabase | https://supabase.com/docs                        |
-| The Met API            | https://metmuseum.github.io/                     |
+| Recurso                | URL                          |
+| ---------------------- | ---------------------------- |
+| Documentación Vue 3    | https://vuejs.org/           |
+| Documentación Supabase | https://supabase.com/docs    |
+| The Met API            | https://metmuseum.github.io/ |
 
----
-
-### **Documento creado:** 04/03/2026
 
 ---
 
@@ -435,7 +432,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 # [2026-03-13] FASE 2: EXPLORACIÓN - COMPLETADA
 
 **Fecha de inicio:** 13 de marzo de 2026  
-**Fecha de finalización:** 14 de marzo de 2026  
+**Fecha de finalización:** 14 de marzo de 2026
 
 ---
 
@@ -475,7 +472,7 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ---
 
-## [2026-03-16] FASE 3: COLECCIONES - SESIÓN 1 
+## [2026-03-16] FASE 3: COLECCIONES - SESIÓN 1
 
 ### Completado
 
@@ -543,10 +540,10 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ### Pendientes para Fase 3
 
-- [ ] Paso 5: Añadir botón "Añadir a colección" en ArtworkDetail.vue
-- [ ] Paso 6: Crear vista CollectionDetail.vue (ver colección)
-- [ ] Paso 7: Crear vista CollectionsGallery.vue (colecciones públicas)
-- [ ] Paso 8: Testing final y ajustes de UX
+- [x] Paso 5: Añadir botón "Añadir a colección" en ArtworkDetail.vue
+- [x] Paso 6: Crear vista CollectionDetail.vue (ver colección)
+- [x] Paso 7: Crear vista CollectionsGallery.vue (colecciones públicas)
+- [x] Paso 8: Testing final y ajustes de UX
 
 ### Notas
 
@@ -555,18 +552,14 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 - Las colecciones pueden ser públicas o privadas
 - Preview de portada valida que la URL sea imagen
 
-### Siguiente Sesión
-
-Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
-
 ---
 
-## [2026-03-17] FASE 3: COLECCIONES - SESIÓN 2 
+## [2026-03-17] FASE 3: COLECCIONES - SESIÓN 2
 
 ### Completado
 
 - [x] **Paso 5:** Añadir obras a colecciones desde ArtworkDetail.vue
-  - Botón "➕ Añadir a colección" en vista de detalle
+  - Botón "Añadir a colección" en vista de detalle
   - Modal de selección de colecciones existentes
   - Creación rápida de colecciones sin salir del modal
   - Sincronización automática de obras en museum_artworks
@@ -597,13 +590,13 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ### Pendientes para Fase 3
 
-- [ ] Paso 6: Crear vista CollectionDetail.vue (ver colección)
-- [ ] Paso 7: Crear vista CollectionsGallery.vue (colecciones públicas)
-- [ ] Paso 8: Testing final y ajustes de UX
+- [x] Paso 6: Crear vista CollectionDetail.vue (ver colección)
+- [x] Paso 7: Crear vista CollectionsGallery.vue (colecciones públicas)
+- [x] Paso 8: Testing final y ajustes de UX
 
 ---
 
-## [2026-03-18] FASE 3: COLECCIONES - SESIÓN 3 - FASE COMPLETADA 
+## [2026-03-18] FASE 3: COLECCIONES - SESIÓN 3 - FASE COMPLETADA
 
 ### Criterios completados
 
@@ -655,19 +648,19 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ### Pendientes para Fase 4
 
-- [ ] Contador de vistas (incrementar al ver colección)
-- [ ] Likes en colecciones
-- [ ] Comentarios en colecciones
-- [ ] Seguir/dejar de seguir usuarios
-- [ ] Notificaciones de interacciones
-- [ ] Menú hamburguesa móvil en TopNav
+- [x] Contador de vistas (incrementar al ver colección)
+- [x] Likes en colecciones
+- [x] Comentarios en colecciones
+- [x] Seguir/dejar de seguir usuarios
+- [x] Notificaciones de interacciones
+- [x] Menú hamburguesa móvil en TopNav
 
 ---
 
 ## [2026-03-20] FASE 4: COMUNIDAD - SESIÓN 1
 
 **Fecha de inicio:** 19 de marzo de 2026  
-**Fecha de finalización:** 20 de marzo de 2026  
+**Fecha de finalización:** 20 de marzo de 2026
 
 ---
 
@@ -704,32 +697,32 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 #### Componentes Nuevos
 
-| Componente | Ubicación | Propósito |
-|------------|-----------|-----------|
-| `LikeButton.vue` | `components/common/` | Botón de like con corazón y contador |
-| `FollowButton.vue` | `components/common/` | Botón seguir/dejar de seguir con contador |
-| `CommentsSection.vue` | `components/comments/` | CRUD completo de comentarios |
-| `NotificationsView.vue` | `views/notifications/` | Bandeja de notificaciones |
+| Componente              | Ubicación              | Propósito                                 |
+| ----------------------- | ---------------------- | ----------------------------------------- |
+| `LikeButton.vue`        | `components/common/`   | Botón de like con corazón y contador      |
+| `FollowButton.vue`      | `components/common/`   | Botón seguir/dejar de seguir con contador |
+| `CommentsSection.vue`   | `components/comments/` | CRUD completo de comentarios              |
+| `NotificationsView.vue` | `views/notifications/` | Bandeja de notificaciones                 |
 
 #### Vistas Actualizadas
 
-| Vista | Cambios |
-|-------|---------|
-| `CollectionDetail.vue` | +LikeButton, +CommentsSection, +FollowButton, +contador de vistas |
-| `TopNav.vue` | +Icono notificaciones con badge, +dropdown de notificaciones, +menú usuario mejorado |
-| `router/index.js` | +Ruta `/notifications` protegida |
+| Vista                  | Cambios                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `CollectionDetail.vue` | +LikeButton, +CommentsSection, +FollowButton, +contador de vistas                    |
+| `TopNav.vue`           | +Icono notificaciones con badge, +dropdown de notificaciones, +menú usuario mejorado |
+| `router/index.js`      | +Ruta `/notifications` protegida                                                     |
 
 ---
 
 ### Bugs Solucionados
 
-| Error | Causa | Solución |
-|-------|-------|----------|
-| Corazón invisible en LikeButton | Clases Tailwind no disponibles | Refactorizar a CSS nativo con variables del Design System |
-| Texto duplicado en FollowButton hover | CSS `::after` superponía texto | Usar clases condicionales con `v-if`/`v-else` |
-| Error 409 (duplicate key) en likes/follows | INSERT sin verificar existencia previa | Consultar con `.maybeSingle()` antes de INSERT/DELETE |
-| Error `onUnmounted` en TopNav | Hooks de lifecycle después de `await` | Registrar `onUnmounted` antes de cualquier `await` |
-| Warning prop `collectionOwnerId` | Prop requerido recibía `null` | Cambiar a `required: false` + `v-if` en padre |
+| Error                                      | Causa                                  | Solución                                                  |
+| ------------------------------------------ | -------------------------------------- | --------------------------------------------------------- |
+| Corazón invisible en LikeButton            | Clases Tailwind no disponibles         | Refactorizar a CSS nativo con variables del Design System |
+| Texto duplicado en FollowButton hover      | CSS `::after` superponía texto         | Usar clases condicionales con `v-if`/`v-else`             |
+| Error 409 (duplicate key) en likes/follows | INSERT sin verificar existencia previa | Consultar con `.maybeSingle()` antes de INSERT/DELETE     |
+| Error `onUnmounted` en TopNav              | Hooks de lifecycle después de `await`  | Registrar `onUnmounted` antes de cualquier `await`        |
+| Warning prop `collectionOwnerId`           | Prop requerido recibía `null`          | Cambiar a `required: false` + `v-if` en padre             |
 
 ---
 
@@ -762,34 +755,31 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ### Archivos Creados
 
-| Archivo | Tipo | Líneas aprox. |
-|---------|------|---------------|
-| `src/composables/useCommunity.js` | Composable | ~350 |
-| `src/components/common/LikeButton.vue` | Componente | ~180 |
-| `src/components/common/FollowButton.vue` | Componente | ~220 |
-| `src/components/comments/CommentsSection.vue` | Componente | ~450 |
-| `src/views/notifications/NotificationsView.vue` | Vista | ~380 |
+| Archivo                                         | Tipo       | Líneas aprox. |
+| ----------------------------------------------- | ---------- | ------------- |
+| `src/composables/useCommunity.js`               | Composable | ~350          |
+| `src/components/common/LikeButton.vue`          | Componente | ~180          |
+| `src/components/common/FollowButton.vue`        | Componente | ~220          |
+| `src/components/comments/CommentsSection.vue`   | Componente | ~450          |
+| `src/views/notifications/NotificationsView.vue` | Vista      | ~380          |
 
 ### Archivos Modificados
 
-| Archivo | Cambios |
-|---------|---------|
-| `src/views/collections/CollectionDetail.vue` | +200 líneas (integración social) |
-| `src/components/common/TopNav.vue` | +150 líneas (notificaciones dropdown) |
-| `src/router/index.js` | +5 líneas (ruta notifications) |
-| `src/composables/useCommunity.js` | Correcciones en `toggleLike` y `toggleFollow` |
+| Archivo                                      | Cambios                                       |
+| -------------------------------------------- | --------------------------------------------- |
+| `src/views/collections/CollectionDetail.vue` | +200 líneas (integración social)              |
+| `src/components/common/TopNav.vue`           | +150 líneas (notificaciones dropdown)         |
+| `src/router/index.js`                        | +5 líneas (ruta notifications)                |
+| `src/composables/useCommunity.js`            | Correcciones en `toggleLike` y `toggleFollow` |
 
 ---
 
 ### Pendientes Post-MVP
 
-| Feature | Prioridad | Complejidad |
-|---------|-----------|-------------|
-| Triggers automáticos para notificaciones | Media | Baja |
-| Actualizar PublicProfileView con followers/following | Alta | Media |
-| Menú hamburguesa móvil en TopNav | Baja | Baja |
-| Footer de la aplicación | Baja | Baja |
-| Testing E2E de flujos sociales | Media | Media |
+| Feature                                              | Prioridad | Complejidad |
+| ---------------------------------------------------- | --------- | ----------- |
+| Actualizar PublicProfileView con followers/following | Alta      | Media       |
+| Footer de la aplicación                              | Baja      | Baja        |
 
 ---
 
@@ -813,19 +803,19 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ## Estado del Proyecto
 
-| Fase | Estado | Fecha Completado |
-|------|--------|------------------|
-| Fase 1: Foundation | Completada | 12/03/2026 |
-| Fase 2: Exploración | Completada | 14/03/2026 |
-| Fase 3: Colecciones | Completada | 18/03/2026 |
-| Fase 4: Comunidad | Completada | 21/03/2026 |
+| Fase                | Estado     | Fecha Completado |
+| ------------------- | ---------- | ---------------- |
+| Fase 1: Foundation  | Completada | 12/03/2026       |
+| Fase 2: Exploración | Completada | 14/03/2026       |
+| Fase 3: Colecciones | Completada | 18/03/2026       |
+| Fase 4: Comunidad   | Completada | 21/03/2026       |
 
 ---
 
 ## [2026-03-21] FASE 4: COMUNIDAD - SESIÓN 2 (Limpieza + Documentación)
 
 **Fecha:** 21 de marzo de 2026  
-**Tipo:** Mantenimiento y documentación  
+**Tipo:** Mantenimiento y documentación
 
 ---
 
@@ -843,23 +833,23 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 #### Limpieza de Código
 
-| Archivo | Cambios |
-|---------|---------|
-| `useCommunity.js` | Eliminados `console.log` debug, añadidos JSDoc, corregida indentación en `toggleFollow` |
-| `TopNav.vue` | Centralizadas constantes de iconos (`NOTIFICATION_ICONS`, `NOTIFICATION_COLORS`), añadidos JSDoc a métodos |
-| `CommunityView.vue` | Eliminados ~15 logs de debug, añadidos JSDoc, simplificados `console.error` en contadores |
+| Archivo             | Cambios                                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `useCommunity.js`   | Eliminados `console.log` debug, añadidos JSDoc, corregida indentación en `toggleFollow`                    |
+| `TopNav.vue`        | Centralizadas constantes de iconos (`NOTIFICATION_ICONS`, `NOTIFICATION_COLORS`), añadidos JSDoc a métodos |
+| `CommunityView.vue` | Eliminados ~15 logs de debug, añadidos JSDoc, simplificados `console.error` en contadores                  |
 
 #### Documentación
 
-| Archivo | Actualización |
-|---------|--------------|
-| `README.md` | Fecha actualizada, estado MVP + código optimizado, nota de últimas mejoras |
-| `PROYECTO.md` | Nueva entrada de bitácora, estado actualizado a "MVP Completo" |
+| Archivo       | Actualización                                                              |
+| ------------- | -------------------------------------------------------------------------- |
+| `README.md`   | Fecha actualizada, estado MVP + código optimizado, nota de últimas mejoras |
+| `PROYECTO.md` | Nueva entrada de bitácora, estado actualizado a "MVP Completo"             |
 
 #### Infraestructura
 
-| Incidencia | Solución |
-|------------|----------|
+| Incidencia                                          | Solución                                   |
+| --------------------------------------------------- | ------------------------------------------ |
 | Supabase proyecto pausado (`ERR_NAME_NOT_RESOLVED`) | Resume Project desde Dashboard de Supabase |
 
 ---
@@ -883,13 +873,13 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ### Archivos Modificados
 
-| Archivo | Tipo de cambio |
-|---------|---------------|
-| `src/composables/useCommunity.js` | Limpieza + documentación |
-| `src/components/common/TopNav.vue` | Limpieza + organización |
-| `src/views/community/CommunityView.vue` | Limpieza + documentación |
-| `README.md` | Documentación actualizada |
-| `PROYECTO.md` | Bitácora + estado actualizado |
+| Archivo                                 | Tipo de cambio                |
+| --------------------------------------- | ----------------------------- |
+| `src/composables/useCommunity.js`       | Limpieza + documentación      |
+| `src/components/common/TopNav.vue`      | Limpieza + organización       |
+| `src/views/community/CommunityView.vue` | Limpieza + documentación      |
+| `README.md`                             | Documentación actualizada     |
+| `PROYECTO.md`                           | Bitácora + estado actualizado |
 
 ---
 
@@ -916,7 +906,7 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 ## [2026-03-21] FASE 4: COMUNIDAD - SESIÓN 3 (Triggers + Session Timeout)
 
 **Fecha:** 21 de marzo de 2026  
-**Tipo:** Implementación final + Seguridad  
+**Tipo:** Implementación final + Seguridad
 
 ---
 
@@ -933,13 +923,14 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 #### Triggers de Notificaciones (Supabase)
 
-| Trigger | Tabla | Función | Tipo Notificación |
-|---------|-------|---------|-------------------|
-| `trigger_notify_collection_liked` | `likes` | `notify_collection_liked()` | `collection_liked` |
-| `trigger_notify_new_comment` | `comments` | `notify_new_comment()` | `new_comment` |
-| `trigger_notify_new_follower` | `follows` | `notify_new_follower()` | `new_follower` |
+| Trigger                           | Tabla      | Función                     | Tipo Notificación  |
+| --------------------------------- | ---------- | --------------------------- | ------------------ |
+| `trigger_notify_collection_liked` | `likes`    | `notify_collection_liked()` | `collection_liked` |
+| `trigger_notify_new_comment`      | `comments` | `notify_new_comment()`      | `new_comment`      |
+| `trigger_notify_new_follower`     | `follows`  | `notify_new_follower()`     | `new_follower`     |
 
 **Características:**
+
 - Funciones SQL con `SECURITY DEFINER` para permisos
 - Se ejecutan `AFTER INSERT` en cada tabla
 - Insertan automáticamente en tabla `notifications`
@@ -947,12 +938,13 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 #### Session Timeout (Frontend)
 
-| Archivo | Propósito |
-|---------|-----------|
+| Archivo                                | Propósito                    |
+| -------------------------------------- | ---------------------------- |
 | `src/composables/useSessionTimeout.js` | Monitor de inactividad (24h) |
-| `src/App.vue` | Integración del composable |
+| `src/App.vue`                          | Integración del composable   |
 
 **Funcionamiento:**
+
 - Detecta eventos de usuario (click, scroll, keypress, etc.)
 - Guarda timestamp en `localStorage` (persiste al cerrar navegador)
 - Verifica cada 60 segundos si hay inactividad
@@ -974,18 +966,18 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 
 ### Archivos Creados
 
-| Archivo | Tipo | Líneas |
-|---------|------|--------|
-| `src/composables/useSessionTimeout.js` | Composable | ~150 |
-| Supabase Functions (3) | SQL Triggers | ~100 |
+| Archivo                                | Tipo         | Líneas |
+| -------------------------------------- | ------------ | ------ |
+| `src/composables/useSessionTimeout.js` | Composable   | ~150   |
+| Supabase Functions (3)                 | SQL Triggers | ~100   |
 
 ### Archivos Modificados
 
-| Archivo | Cambios |
-|---------|---------|
-| `src/App.vue` | + Integración de useSessionTimeout |
-| `README.md` | + Sección de seguridad + notificaciones automáticas |
-| `PROYECTO.md` | + Entrada de bitácora + estado final |
+| Archivo       | Cambios                                             |
+| ------------- | --------------------------------------------------- |
+| `src/App.vue` | + Integración de useSessionTimeout                  |
+| `README.md`   | + Sección de seguridad + notificaciones automáticas |
+| `PROYECTO.md` | + Entrada de bitácora + estado final                |
 
 ---
 
@@ -1031,3 +1023,93 @@ Continuar con **Paso 5: Integrar "Añadir a colección" en ArtworkDetail.vue**
 - [x] Triggers automáticos de notificaciones
 - [x] Supabase conectado y estable
 - [x] Testing E2E de flujos sociales
+
+---
+
+## [2026-04-10] FASE 4: COMUNIDAD - FIX CRÍTICO (Doble Click en Botones)
+
+**Fecha:** 10 de abril de 2026  
+**Tipo:** Corrección de bug crítico
+
+---
+
+### Problema Identificado
+
+Los botones `LikeButton` y `FollowButton` requerían **dos clicks** para funcionar correctamente al navegar a `/collections/:id`:
+
+- Primer click: No hacía nada (estado desincronizado)
+- Segundo click: Funcionaba correctamente
+
+---
+
+### Causa Raíz
+
+Los botones se renderizaban con valores por defecto (`initialLiked=false`, `initialFollowing=false`) **antes** de que `fetchLikeStatus()` y `fetchFollowStatus()` terminaran de consultar la base de datos.
+
+---
+
+### Solución Implementada
+
+1. **Flag `statusLoaded` en `CollectionDetail.vue`**:
+
+``` javascript
+const statusLoaded = ref(false)  // Controla cuándo renderizar botones
+```
+
+2. **Activar flag después de los fetch**:
+``` javascript
+await fetchLikeStatus(...)
+await fetchFollowStatus(...)
+statusLoaded.value = true  // Ahora los botones reciben estado real
+```
+
+3. **Renderizado condicional en template**:
+``` vue
+<LikeButton v-if="statusLoaded" ... />
+<FollowButton v-if="... && statusLoaded" ... />
+```
+
+4. **Corrección adicional**: `getUser()` → `getSession()` para obtener usuario correctamente.
+
+---
+
+### Resultado
+
+✅ Botones muestran estado real desde el inicio (corazón relleno si ya diste like)
+✅ Funcionan al primer click siempre
+✅ Estado se mantiene al recargar página
+✅ Sin sobrescritura de estado del composable
+
+---
+
+### Archivos modificados
+
+| Archivo                | Cambios                                                           |
+| ---------------------- | ----------------------------------------------------------------- |
+| `CollectionDetail.vue` | +statusLoaded flag, +v-if condicional, fix getSession()           |
+
+---
+
+### Pruebas realizadas
+
+- Navegar a colección con like previo → corazón aparece relleno
+- Click en like → cambia estado inmediatamente
+- Recargar página → estado visual se mantiene
+- Seguir/dejar de seguir → funciona al primer click
+- Console limpia sin errores
+
+### Notas técnicas
+
+- Patrón aplicado: Renderizado condicional basado en carga de datos asíncrona
+- Lección: Nunca renderizar componentes hijos que dependan de estado asíncrono sin un flag de "listo"
+- Impacto: Mejora crítica de UX, elimina confusión de usuarios
+
+### Checklist de fix
+
+- Identificar patrón del bug (doble click)
+- Diagnosticar causa (timing de renderizado vs fetch)
+- Implementar flag `statusLoaded`
+- Añadir `v-if` condicional en botones
+- Corregir `getSession()` en lugar de `getUser()`
+- Probar flujo completo (like, follow, recargar)
+- Commit: `Fix: botones like/follow muestran estado real al cargar`

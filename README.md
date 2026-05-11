@@ -39,23 +39,30 @@ La aplicación sigue una arquitectura basada en componentes modulares y servicio
 ## Estructura del proyecto
 
 src/
-├── assets/             # Estilos globales y variables CSS
-├── components/         # Componentes UI reutilizables
-│ ├── artworks/         # Tarjetas y detalles de obras
-│ ├── collections/      # Formularios y listas de colecciones
-│ ├── comments/         # Sección de comentarios (CommentsSection.vue)
-│ └── common/           # Elementos comunes (Nav, LikeButton, FollowButton)
-├── composables/        # Lógica de estado reutilizable
-│   ├── useAuth.js
-│   ├── useCollections.js
-│   ├── useArtworks.js
-│   └── useCommunity.js # NUEVO - Interacciones sociales
-├── router/             # Configuración de rutas protegidas y públicas
-├── services/           # Conexión con APIs externas y Supabase
-├── views/              # Vistas principales de la aplicación
-│   ├── notifications/  # NUEVO - Bandeja de notificaciones
-│   └── ...
-└── App.vue             # Componente raíz
+├── assets/ # Estilos globales y variables CSS
+├── components/ # Componentes UI reutilizables
+│ ├── artworks/ # Tarjetas y detalles de obras
+│ ├── collections/ # Formularios y listas de colecciones
+│ ├── comments/ # Sección de comentarios
+│ └── common/ # Elementos comunes (Nav, LikeButton, FollowButton)
+├── composables/ # Lógica de estado reutilizable
+│ ├── useAuth.js
+│ ├── useCollections.js
+│ ├── useArtworks.js
+│ └── useCommunity.js # Interacciones sociales (Fase 4)
+├── router/ # Configuración de rutas (públicas/privadas)
+├── services/ # Conexión con APIs externas y Supabase
+├── views/ # Vistas principales
+│ ├── auth/ # Login, Register
+│ ├── collections/ # Galería, detalle, mis colecciones
+│ ├── explore/ # Explorador de obras, detalle
+│ ├── profile/ # Perfil público, edición
+│ ├── notifications/ # Bandeja de notificaciones (Fase 4)
+│ └── HomeView.vue
+├── supabase/ # Cliente Supabase configurado
+├── App.vue # Componente raíz
+├── main.js # Punto de entrada
+└── style.css # Estilos base
 
 ---
 
@@ -189,13 +196,14 @@ La aplicación implementa un sistema de cierre automático de sesión por inacti
 
 El sistema genera notificaciones automáticamente mediante triggers de base de datos:
 
-| Evento | Trigger | Notificación |
-|--------|---------|--------------|
-| Like en colección | `trigger_notify_collection_liked` | `collection_liked` |
-| Comentario en colección | `trigger_notify_new_comment` | `new_comment` |
-| Nuevo seguidor | `trigger_notify_new_follower` | `new_follower` |
+| Evento                  | Trigger                           | Notificación       |
+| ----------------------- | --------------------------------- | ------------------ |
+| Like en colección       | `trigger_notify_collection_liked` | `collection_liked` |
+| Comentario en colección | `trigger_notify_new_comment`      | `new_comment`      |
+| Nuevo seguidor          | `trigger_notify_new_follower`     | `new_follower`     |
 
 **Ventajas:**
+
 - Sin código extra en el frontend
 - Consistencia garantizada
 - Escalable a cualquier número de usuarios
@@ -212,13 +220,16 @@ Los datos de las obras de arte pertenecen a The Metropolitan Museum of Art y se 
 
 **Versión:** MVP 1.0.0  
 **Fases Completadas:** 4/4  
-**Estado:** MVP Completo
+**Estado:** ✅ MVP Completo + En Producción  
+**Deploy:** [https://kura.vercel.app](https://kura.vercel.app) *(reemplazar con tu URL real)*
 
 Hemos completado el roadmap inicial de 4 fases y el proyecto está listo para:
 - Testing final de UX
-- Deploy a producción
+- Deploy a producción (completado en Vercel)
 - Feedback de usuarios beta
+- Iteración con features post-MVP
 
+> **Última corrección crítica (10/04/2026):** Fix del bug de doble click en botones like/follow mediante flag `statusLoaded` para renderizado condicional.
 
 **Desarrollador Principal:** Adrian Lara  
 **Fecha de última actualización:** 10 de abril de 2026
