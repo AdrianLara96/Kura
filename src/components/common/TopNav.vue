@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useCommunity } from '@/composables/useCommunity'
+import ThemeToggle from '@/components/common/ThemeToggle.vue'
 
 // ============================================
 // ROUTER
@@ -262,6 +263,8 @@ onMounted(async () => {
            ACCIONES DERECHA
            ============================================ -->
       <div class="nav-actions">
+        <ThemeToggle />
+        
         <!-- Usuario no logueado -->
         <template v-if="!isLoggedIn">
           <button class="nav-btn nav-btn-ghost" @click="navigateTo('/login')" type="button">

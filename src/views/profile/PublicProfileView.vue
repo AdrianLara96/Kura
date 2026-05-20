@@ -1,6 +1,5 @@
 <template>
   <div class="public-profile-view">
-    <TopNav />
 
     <main class="profile-container container">
       
@@ -193,7 +192,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useAuth } from '@/composables/useAuth'
 import { useCommunity } from '@/composables/useCommunity'
-import TopNav from '@/components/common/TopNav.vue'
 import FollowButton from '@/components/common/FollowButton.vue'
 
 const route = useRoute()

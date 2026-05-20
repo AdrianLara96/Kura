@@ -2,7 +2,6 @@
 
 <template>
   <div class="explore-view">
-    <TopNav />
     
     <main class="explore-container container">
       
@@ -12,22 +11,84 @@
         <p class="page-subtitle">Descubre miles de obras maestras de museos internacionales</p>
         
         <!-- Barra de búsqueda con filtros horizontales -->
-        <form @submit.prevent="handleSearch" class="search-bar">
-          
-          <!-- Input de búsqueda -->
-          <div class="search-input-wrapper">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input
-              v-model="searchQuery"
-              type="search"
-              placeholder="Busca por artista, título, movimiento..."
-              class="search-input"
-              :disabled="loading"
-              aria-label="Buscar obras de arte"
-            />
+        <form @submit.prevent="handleSearchWithHistory" class="search-bar">
+          <div class="search-container" ref="searchContainerRef">
+            <div class="search-input-wrapper">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                ref="searchInputRef"
+                v-model="searchQuery"
+                type="search"
+                placeholder="Busca por artista, título, movimiento..."
+                class="search-input"
+                :disabled="loading"
+                @focus="showHistoryDropdown = history.length > 0"
+                @input="showHistoryDropdown = history.length > 0"
+                @keydown.enter="handleSearchWithHistory"
+                aria-label="Buscar obras de arte"
+              />
+              
+              <!-- Botón para limpiar input (si no lo tienes ya) -->
+              <button 
+                v-if="searchQuery" 
+                class="search-clear-btn" 
+                @click="searchQuery = ''; showHistoryDropdown = false" 
+                type="button"
+                aria-label="Limpiar búsqueda"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Dropdown de Historial con Teleport -->
+            <Teleport to="body">
+              <transition name="dropdown">
+                <div 
+                  v-if="showHistoryDropdown && history.length > 0" 
+                  class="history-dropdown-portal"
+                  :style="dropdownStyles"
+                >
+                  <div class="history-header">
+                    <span class="history-title">Búsquedas recientes</span>
+                    <button class="history-clear-btn" @click.stop="clearHistory" type="button">
+                      Limpiar
+                    </button>
+                  </div>
+                  
+                  <ul class="history-list">
+                    <li 
+                      v-for="term in history" 
+                      :key="term" 
+                      class="history-item"
+                      @click="selectHistoryTerm(term)"
+                    >
+                      <svg class="history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      <span class="history-text">{{ term }}</span>
+                      <button 
+                        class="history-remove-btn" 
+                        @click.stop="removeTerm(term)" 
+                        type="button"
+                        aria-label="Eliminar del historial"
+                      >
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </transition>
+            </Teleport>
           </div>
           
           <!-- Filtro de departamentos (dropdown) -->
@@ -58,6 +119,19 @@
           >
             <span v-if="loading" class="spinner-small"></span>
             <span v-else>Buscar</span>
+          </button>
+
+          <!-- Botón de descubrimiento aleatorio -->
+          <button
+            type="button"
+            @click="handleRandomDiscovery"
+            :disabled="loading"
+            class="search-button search-button-random"
+            title="Descubrir obra aleatoria (atajo: R)"
+            aria-label="Descubrir obra aleatoria"
+          >
+            <span v-if="loading" class="spinner-small"></span>
+            <span v-else>🎲 Descubrir</span>
           </button>
         </form>
         
@@ -144,7 +218,7 @@
             <button @click="handleResetFilters" :disabled="loading" class="btn btn-secondary">
               Limpiar filtros
             </button>
-            <button @click="handleSearch" :disabled="loading" class="btn btn-retry">
+            <button @click="handleSearchWithHistory" :disabled="loading" class="btn btn-retry">
               Reintentar
             </button>
           </div>
@@ -246,11 +320,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useArtworks } from '@/composables/useArtworks'
 import { searchArtworks, SEARCH_SUGGESTIONS } from '../../services/museumApi'
-import TopNav from '@/components/common/TopNav.vue'
+import { useSearchHistory } from '../../composables/useSearchHistory'
 
 const { 
   artworks, 
@@ -263,13 +337,22 @@ const {
   setDepartmentFilter, 
   resetFilters,
   goToPage,
-  getAvailableDepartments 
+  getAvailableDepartments,
+  fetchRandomArtwork
 } = useArtworks()
 
 const router = useRouter()
 const searchQuery = ref('')
 const hasSearched = ref(false)
 const selectedDepartment = ref(null)
+const showHistoryDropdown = ref(false)
+const { history, addTerm, removeTerm, clearHistory } = useSearchHistory()
+
+// === REFERENCIAS PARA POSICIONAMIENTO ===
+const searchInputRef = ref(null)
+const dropdownStyles = ref({})
+
+const searchContainerRef = ref(null)
 
 // Lista de departamentos disponibles para el filtro
 const availableDepartments = getAvailableDepartments()
@@ -328,8 +411,122 @@ const visiblePages = computed(() => {
   return pages.sort((a, b) => a - b)
 })
 
+// === HISTORIAL DE BÚSQUEDAS - HANDLERS ===
+
+// === CALCULAR POSICIÓN DEL DROPDOWN ===
+const updateDropdownPosition = () => {
+  if (!searchInputRef.value) return
+  
+  const inputRect = searchInputRef.value.getBoundingClientRect()
+  
+  dropdownStyles.value = {
+    position: 'fixed',
+    top: `${inputRect.bottom + 8}px`, // 8px = var(--spacing-xs)
+    left: `${Math.max(16, inputRect.left)}px`, // Mínimo 16px del borde
+    right: `${Math.max(16, window.innerWidth - inputRect.right)}px`,
+    maxWidth: '400px',
+    width: 'auto',
+    zIndex: 9999 // Valor muy alto para asegurar visibilidad
+  }
+}
+
+/**
+ * Cierra el dropdown si el click ocurre fuera del contenedor de búsqueda
+ */
+const handleClickOutside = (event) => {
+  if (searchContainerRef.value && !searchContainerRef.value.contains(event.target)) {
+    showHistoryDropdown.value = false
+  }
+}
+
+/**
+ * Selecciona un término del historial y ejecuta búsqueda
+ */
+const selectHistoryTerm = (term) => {
+  searchQuery.value = term
+  showHistoryDropdown.value = false
+  handleSearch()
+}
+
+/**
+ * Handler para atajo de teclado 'R' - Descubrimiento aleatorio
+ * Se define aquí para poder referenciarla tanto en onMounted como en onUnmounted
+ */
+const handleKeydown = (e) => {
+  // Solo activar si:
+  // 1. La tecla es 'R' (mayúscula o minúscula)
+  // 2. El foco NO está en un input, textarea o select (evitar conflicto al escribir)
+  if (e.key.toLowerCase() === 'r' && !e.target.closest('input, textarea, select')) {
+    e.preventDefault()
+    handleRandomDiscovery()
+  }
+}
+
+/**
+ * Wrapper para handleSearch que guarda en historial antes de buscar
+ */
+const handleSearchWithHistory = async () => {
+  const query = searchQuery.value.trim()
+  if (!query && !selectedDepartment.value) return
+
+  // Guardar en historial solo si hay query de texto
+  if (query) {
+    addTerm(query)
+  }
+  
+  hasSearched.value = true
+  
+  try {
+    await search({ 
+      query, 
+      departmentIds: selectedDepartment.value ? [selectedDepartment.value] : [],
+      page: 1
+    })
+  } catch (err) {
+    console.warn('Búsqueda fallida:', err)
+  }
+}
+
+// === ACTUALIZAR POSICIÓN EN RESIZE Y SCROLL ===
+const setupPositionListener = () => {
+  window.addEventListener('resize', updateDropdownPosition)
+  window.addEventListener('scroll', updateDropdownPosition, true) // true = capture phase
+  
+  return () => {
+    window.removeEventListener('resize', updateDropdownPosition)
+    window.removeEventListener('scroll', updateDropdownPosition, true)
+  }
+}
+
+// === WATCHER PARA ABRIR/CERRAR LISTENERS ===
+watch(showHistoryDropdown, (isOpen) => {
+  if (isOpen) {
+    // Esperar a que el DOM se actualice antes de medir posiciones
+    nextTick(() => {
+      updateDropdownPosition()
+      window.addEventListener('resize', updateDropdownPosition)
+      window.addEventListener('scroll', updateDropdownPosition, true) // true = capture phase
+    })
+  } else {
+    // Limpiar listeners cuando se cierra el dropdown
+    window.removeEventListener('resize', updateDropdownPosition)
+    window.removeEventListener('scroll', updateDropdownPosition, true)
+  }
+})
+
+// === LIFECYCLE HOOKS ===
+
 onMounted(() => {
-  // Limpieza de logs para producción
+  // Listener para cerrar dropdown al hacer click fuera
+  document.addEventListener('click', handleClickOutside)
+
+  // Atajo de teclado: 'R' para descubrimiento aleatorio
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('keydown', handleKeydown)
 })
 
 // Handlers de búsqueda
@@ -371,6 +568,29 @@ const handleDepartmentChange = async () => {
 const handleResetFilters = async () => {
   selectedDepartment.value = null
   await resetFilters()
+}
+
+/**
+ * Maneja el descubrimiento aleatorio: obtiene una obra random y navega a su detalle
+ */
+const handleRandomDiscovery = async () => {
+  // Evitar múltiples clics mientras carga
+  if (loading.value) return
+  
+  try {
+    const artwork = await fetchRandomArtwork(3) // 3 intentos máximos
+    
+    if (artwork?.museum_id) {
+      // Navegar directamente al detalle de la obra encontrada
+      viewArtwork(artwork.museum_id)
+    } else {
+      // Si no se encontró obra, mostrar mensaje amigable
+      alert('No pudimos encontrar una obra en este momento. Por favor, inténtalo de nuevo.')
+    }
+  } catch (err) {
+    console.error('Error en descubrimiento aleatorio:', err)
+    alert('Hubo un problema al buscar una obra aleatoria. Intenta de nuevo.')
+  }
 }
 
 // Handlers de paginación
@@ -588,7 +808,7 @@ const viewArtwork = (museumId) => {
   }
 }
 
-/* Flecha personalizada para el select */
+/* ===== Flecha personalizada para el select ===== */
 .filter-wrapper::after {
   content: '▼';
   position: absolute;
@@ -600,7 +820,7 @@ const viewArtwork = (museumId) => {
   pointer-events: none;
 }
 
-/* Botón de búsqueda */
+/* ===== Botón de búsqueda ===== */
 .search-button {
   background: var(--kura-bright-teal);
   color: #ffffff;
@@ -627,6 +847,28 @@ const viewArtwork = (museumId) => {
   opacity: 0.6;
   cursor: not-allowed;
   background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+/* ===== BOTÓN DE DESCUBRIMIENTO ALEATORIO ===== */
+.search-button-random {
+  background: transparent;
+  border: 1px solid var(--kura-gold);
+  color: var(--kura-gold);
+}
+
+.search-button-random:hover:not(:disabled) {
+  background: rgba(191, 172, 139, 0.15);
+  border-color: var(--kura-gold);
+  color: var(--kura-gold);
+  transform: scale(1.02);
+}
+
+.search-button-random:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-tertiary);
+  border-color: var(--border-subtle);
   color: var(--text-muted);
 }
 
@@ -892,6 +1134,11 @@ const viewArtwork = (museumId) => {
     width: 100%;
     justify-content: center;
   }
+
+  .search-button-random {
+    width: 100%;
+    justify-content: center;
+  }
   
   .pagination {
     gap: var(--spacing-xs);
@@ -1140,5 +1387,182 @@ const viewArtwork = (museumId) => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* ============================================
+   SEARCH CONTAINER & HISTORY DROPDOWN
+   ============================================ */
+
+.search-container {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+}
+
+.search-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  margin-left: var(--spacing-xs);
+}
+
+.search-clear-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+/* ===== DROPDOWN HISTORIAL ===== */
+.history-dropdown {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  left: var(--spacing-md);
+  right: var(--spacing-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  overflow: hidden;
+  max-width: 400px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
+}
+
+.history-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.history-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--kura-bright-teal);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.history-clear-btn:hover {
+  background: var(--bg-elevated);
+}
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.history-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.history-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.history-text {
+  flex: 1;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.history-item:hover .history-remove-btn {
+  opacity: 1;
+}
+
+.history-remove-btn:hover {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ===== DROPDOWN PORTAL (fuera del flujo normal) ===== */
+.history-dropdown-portal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 9999;
+}
+
+/* Ajuste específico para el portal: max-height con scroll */
+.history-dropdown-portal .history-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Animación dropdown */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Responsive: ajustar posición en móvil */
+@media (max-width: 768px) {
+  .history-dropdown {
+    left: var(--spacing-sm);
+    right: var(--spacing-sm);
+    max-width: none;
+  }
 }
 </style>

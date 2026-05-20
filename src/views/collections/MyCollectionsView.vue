@@ -1,6 +1,5 @@
 <template>
   <div class="my-collections-view">
-  <TopNav />
     
     <!-- Cabecera de Página -->
     <header class="page-header container">
@@ -223,7 +222,6 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCollections } from '@/composables/useCollections'
 import CollectionForm from '@/components/collections/CollectionForm.vue'
-import TopNav from '@/components/common/TopNav.vue'
 
 const router = useRouter()
 const { 

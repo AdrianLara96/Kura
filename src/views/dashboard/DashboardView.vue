@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard-view">
-    <TopNav />
 
     <main class="dashboard-content container">
       
@@ -99,7 +98,6 @@
 
 <script setup>
 import { useAuth } from '@/composables/useAuth'
-import TopNav from '@/components/common/TopNav.vue'
 
 const { user, signOut } = useAuth()
 

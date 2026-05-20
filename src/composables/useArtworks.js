@@ -1,7 +1,7 @@
 // src/composables/useArtworks.js
 
 import { ref } from 'vue'
-import { searchArtworks, getArtworkById, getFeaturedArtworks, getDepartments } from '@/services/museumApi'
+import { searchArtworks, getArtworkById, getFeaturedArtworks, getDepartments, getRandomArtwork } from '@/services/museumApi'
 
 export function useArtworks() {
   // Estado reactivo - Obras y carga
@@ -101,6 +101,29 @@ export function useArtworks() {
     } catch (err) {
       console.error('Error en getArtwork:', err)
       error.value = err.message || 'No se pudo cargar la obra'
+      return null
+      
+    } finally {
+      loading.value = false
+    }
+  }
+
+    /**
+   * Obtiene una obra aleatoria para descubrimiento serendípito
+   * @param {number} maxAttempts - Intentos máximos para encontrar obra válida
+   * @returns {Promise<Object|null>} Obra normalizada o null en caso de error
+   */
+  const fetchRandomArtwork = async (maxAttempts = 3) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const artwork = await getRandomArtwork(maxAttempts)
+      return artwork
+      
+    } catch (err) {
+      console.error('Error en fetchRandomArtwork:', err)
+      error.value = err.message || 'No se pudo encontrar una obra aleatoria'
       return null
       
     } finally {
@@ -256,6 +279,7 @@ export function useArtworks() {
     search,
     getArtwork,
     getFeatured,
+    fetchRandomArtwork,
     goToPage,
     reload,
     

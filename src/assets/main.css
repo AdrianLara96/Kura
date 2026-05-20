@@ -2,62 +2,120 @@
    KURA - SISTEMA DE DISEÑO
    ============================================ */
 
+/* ============================================
+   DESIGN SYSTEM - TEMAS
+   ============================================ */
+
 :root {
-  /* --- PALETA BASE (Identidad de Marca) --- */
-  --kura-black: #000706;
-  --kura-deep-teal: #00272d;
-  --kura-teal: #134647;
-  --kura-bright-teal: #0c7e7e;
-  --kura-gold: #bfac8b;
-
-  /* --- VARIABLES SEMÁNTICAS (TEMA OSCURO POR DEFECTO) --- */
+  /* ===== FONDO ===== */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #14141f;
+  --bg-tertiary: #1e1e2e;
+  --bg-elevated: #282838;
   
-  /* Fondos */
-  --bg-primary: var(--kura-black);
-  --bg-secondary: var(--kura-deep-teal);
-  --bg-tertiary: rgba(255, 255, 255, 0.05);
-  --bg-overlay: rgba(0, 7, 6, 0.85);
-
-  /* Texto */
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --text-muted: #6e6e6e;
-  --text-accent: var(--kura-gold);
-
-  /* Bordes y Separadores */
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --border-active: var(--kura-teal);
-  --border-highlight: var(--kura-gold);
-
-  /* Sombras (Ajustadas para fondo oscuro) */
-  /* En dark mode, las sombras son más sutiles o se usan bordes brillantes */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --glow-accent: 0 0 15px rgba(12, 126, 126, 0.4); /* Resplandor teal */
-
-  /* Tipografía */
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  /* ===== TEXTO ===== */
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-inverse: #0a0a0f;
   
-  /* Espaciado (Escala consistente) */
-  --spacing-xs: 0.5rem;  /* 8px */
-  --spacing-sm: 0.75rem; /* 12px */
-  --spacing-md: 1rem;    /* 16px */
-  --spacing-lg: 1.5rem;  /* 24px */
-  --spacing-xl: 2rem;    /* 32px */
-  --spacing-xxl: 3rem;   /* 48px */
+  /* ===== BORDES ===== */
+  --border-subtle: #27272a;
+  --border-default: #3f3f46;
   
-  /* Border Radius */
+  /* ===== ACCENTOS (genéricos) ===== */
+  --accent-primary: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-active: #4f46e5;
+  
+  /* ===== PALETA KURA - COLORES DE MARCA ===== */
+  --kura-teal: #0c7e7e;
+  --kura-bright-teal: #14b8a6;
+  --kura-gold: #d4af37;
+  --kura-charcoal: #1a1a2e;
+  --kura-stone: #8b7355;
+  
+  /* ===== ESTADOS ===== */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* ===== SOMBRAS ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  
+  /* ===== RADIOS ===== */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
   --radius-full: 9999px;
+  
+  /* ===== ESPACIADO ===== */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* ===== TRANSICIONES ===== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+  
+  /* ===== TIPOGRAFÍA ===== */
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
 
-  /* Transiciones */
-  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.5s ease;
+/* ===== TEMA CLARO ===== */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-elevated: #e2e8f0;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+  
+  --border-subtle: #e2e8f0;
+  --border-default: #cbd5e1;
+  
+  --accent-primary: #4f46e5;
+  --accent-hover: #6366f1;
+  --accent-active: #4338ca;
+  
+  /* Paleta Kura se mantiene igual (funciona en ambos temas) */
+  --kura-teal: #0c7e7e;
+  --kura-bright-teal: #14b8a6;
+  --kura-gold: #d4af37;
+  --kura-charcoal: #1a1a2e;
+  --kura-stone: #8b7355;
+  
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+  --info: #2563eb;
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Transición suave entre temas */
+* {
+  transition: background-color var(--transition-normal), 
+              color var(--transition-normal), 
+              border-color var(--transition-normal);
+}
+
+html {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* ============================================
@@ -80,20 +138,18 @@ body {
   color: var(--text-primary);
   font-family: var(--font-main);
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased; /* Mejora la renderización de fuentes en Mac */
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Scrollbar personalizado para Webkit (Chrome, Safari, Edge) */
+/* Scrollbar personalizado para Webkit */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -130,6 +186,92 @@ body {
 }
 
 /* ============================================
+   COMPONENTES REUTILIZABLES
+   ============================================ */
+
+/* Botones base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+}
+
+.btn-primary {
+  background: var(--kura-bright-teal);
+  color: var(--text-inverse);
+}
+
+.btn-primary:hover {
+  background: var(--kura-teal);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-elevated);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+}
+
+/* Tarjetas */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-default);
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--kura-bright-teal);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ============================================
    ANIMACIONES
    ============================================ */
 
@@ -148,12 +290,15 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Clase utilitaria para animaciones de entrada */
 .animate-fade-in {
   animation: fadeIn var(--transition-normal) forwards;
 }
 
-/* Loader Skeleton (Útil mientras cargan las APIs) */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Loader Skeleton */
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -164,4 +309,39 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: var(--radius-md);
+}
+
+/* ============================================
+   ACCESIBILIDAD
+   ============================================ */
+
+/* Enfoque visible para navegación por teclado */
+:focus-visible {
+  outline: 2px solid var(--kura-bright-teal);
+  outline-offset: 2px;
+}
+
+/* Texto solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reducir movimiento para usuarios con preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,6 +1,5 @@
 <template>
   <div class="profile-edit-view">
-    <TopNav />
 
     <main class="profile-container container">
       
@@ -220,7 +219,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
-import TopNav from '@/components/common/TopNav.vue'
 
 const { user, signOut, fetchProfile, updateProfile, uploadProfileAvatar, getDefaultAvatar } = useAuth()
 const router = useRouter()

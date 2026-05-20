@@ -1,7 +1,6 @@
 <template>
   <div class="collections-gallery-view">
 
-    <TopNav/>
     
     <!-- Header de Página -->
     <header class="page-header container">
@@ -143,7 +142,6 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useAuth } from '@/composables/useAuth'
 import CollectionCard from '@/components/collections/CollectionCard.vue'
-import TopNav from '@/components/common/TopNav.vue'
 
 const router = useRouter()
 const { isLoggedIn } = useAuth()

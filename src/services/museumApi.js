@@ -40,6 +40,13 @@ export const SEARCH_SUGGESTIONS = [
 ];
 
 /**
+ * Rango estimado de objectIDs válidos en The Met API
+ * Los IDs válidos suelen estar entre 1 y ~800,000
+ * Usamos un rango conservador para maximizar hits
+ */
+export const MET_OBJECTID_RANGE = { min: 1, max: 800000 };
+
+/**
  * Helper para esperar X milisegundos
  * Usado para delays entre reintentos
  */
@@ -390,4 +397,93 @@ export async function getFeaturedArtworks(limit = 12) {
     console.error('Error en getFeaturedArtworks:', err);
     return [];
   }
+
+}
+
+/**
+* Obtiene una obra aleatoria de The Met mediante generación de objectID aleatorio
+* Implementa reintentos automáticos para manejar 404s (IDs que no existen)
+* @param {number} maxAttempts - Número máximo de intentos (default: 3)
+* @returns {Promise<Object|null>} Obra normalizada o null tras agotar intentos
+*/
+export async function getRandomArtwork(maxAttempts = 3) {
+let lastError = null;
+
+for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  try {
+    // Generar objectID aleatorio dentro del rango válido
+    const objectID = Math.floor(
+      Math.random() * (MET_OBJECTID_RANGE.max - MET_OBJECTID_RANGE.min + 1)
+    ) + MET_OBJECTID_RANGE.min;
+    
+    const url = `${MET_BASE_URL}/objects/${objectID}`;
+    
+    // Fetch con timeout pero SIN reintentos internos (manejamos retries aquí)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    
+    let metData;
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: { 'Accept': 'application/json' }
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.status === 404) {
+        // ID no válido, reintentar con otro número
+        console.log(`⚠️ Intento ${attempt}: objectID ${objectID} no existe (404)`);
+        lastError = new Error('ID no encontrado');
+        continue;
+      }
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      metData = await response.json();
+      
+    } catch (fetchErr) {
+      clearTimeout(timeoutId);
+      throw fetchErr;
+    }
+    
+    // Normalizar y validar
+    if (!metData) {
+      lastError = new Error('Respuesta vacía de la API');
+      continue;
+    }
+    
+    const normalized = normalizeMetArtwork(metData);
+    
+    if (!normalized) {
+      // La obra no tiene imagen, reintentar
+      console.log(`⚠️ Intento ${attempt}: obra ${objectID} sin imagen primaria`);
+      lastError = new Error('Obra sin imagen');
+      continue;
+    }
+    
+    console.log(`✓ Obra aleatoria encontrada en intento ${attempt}: ${objectID}`);
+    return normalized;
+    
+  } catch (err) {
+    lastError = err;
+    console.warn(`⚠️ Error en intento ${attempt} para obra aleatoria:`, err.message);
+    
+    // Si es error de red/timeout, no reintentar con otro ID (el problema es la conexión)
+    if (err.name === 'AbortError' || err.message.includes('fetch')) {
+      break;
+    }
+    
+    // Pequeño delay entre intentos para no saturar
+    if (attempt < maxAttempts) {
+      await sleep(500);
+    }
+  }
+}
+
+// Agotados los intentos, lanzar error con último mensaje
+console.error('❌ No se pudo obtener obra aleatoria tras', maxAttempts, 'intentos');
+throw new Error(lastError?.message || 'No se encontró una obra válida');
 }

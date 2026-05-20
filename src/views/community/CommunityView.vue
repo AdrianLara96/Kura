@@ -6,7 +6,6 @@
 
 <template>
   <div class="community-view">
-    <TopNav />
 
     <main class="community-container container">
       
@@ -135,7 +134,6 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useAuth } from '@/composables/useAuth'
-import TopNav from '@/components/common/TopNav.vue'
 import FollowButton from '@/components/common/FollowButton.vue'
 
 // ============================================

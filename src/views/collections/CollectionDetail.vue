@@ -14,7 +14,6 @@ import { useCommunity } from '@/composables/useCommunity'
 import LikeButton from '@/components/common/LikeButton.vue'
 import CommentsSection from '@/components/comments/CommentsSection.vue'
 import FollowButton from '@/components/common/FollowButton.vue'
-import TopNav from '@/components/common/TopNav.vue'
 
 
 // ============================================
@@ -254,7 +253,6 @@ async function handleDeleteCollection() {
 
 <template>
   <div class="collection-detail-view">
-    <TopNav/>
 
     <!-- ============================================
          ESTADO: CARGANDO

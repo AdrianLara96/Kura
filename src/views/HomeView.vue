@@ -1,7 +1,5 @@
 <template>
   <div class="home-view">
-    <!-- Navegación Superior -->
-    <TopNav />   
   
     <!-- Contenido Principal -->
     <main class="home-content container">
@@ -90,7 +88,6 @@
 
 <script setup>
 import { useAuth } from '@/composables/useAuth'
-import TopNav from '@/components/common/TopNav.vue'
 
 const { user, isAuthenticated, signOut } = useAuth()
 
