@@ -189,6 +189,17 @@
 
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const isEditMode = computed(() => !!route.params.id)
+
+onMounted(async () => {
+  if (isEditMode.value) {
+    // Cargar datos de la colección existente
+    await fetchCollection(route.params.id)
+  }
+})
 
 const props = defineProps({
   initialData: {

@@ -1,9 +1,7 @@
-<!-- ============================================
-     VISTA: CollectionDetail.vue
-     ============================================
-     Detalle de colección con likes, comentarios y follow
-     Actualizado Fase 4: Interacciones sociales
-  -->
+<!--
+VISTA: CollectionDetail.vue
+Detalle de colección con likes, comentarios y follow
+-->
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
@@ -11,6 +9,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { supabase } from '@/supabase/client'
 import { useCollections } from '@/composables/useCollections'
 import { useCommunity } from '@/composables/useCommunity'
+import { useCollectionExport } from '@/composables/useCollectionExport'
 import LikeButton from '@/components/common/LikeButton.vue'
 import CommentsSection from '@/components/comments/CommentsSection.vue'
 import FollowButton from '@/components/common/FollowButton.vue'
@@ -24,7 +23,7 @@ const router = useRouter()
 const route = useRoute()
 
 // ============================================
-// COMPOSABLES
+// COMPOSABLES: Inicialización de composables
 // ============================================
 
 const { 
@@ -47,6 +46,10 @@ const {
   fetchLikeStatus,
   fetchFollowStatus
 } = useCommunity()
+
+const { 
+  exportCollection: exportCollectionToMd 
+} = useCollectionExport()
 
 // ============================================
 // ESTADO LOCAL
@@ -228,7 +231,7 @@ function handleCommentDeleted(commentId) {
 }
 
 /**
- * Eliminar colección (solo dueño)
+ * Eliminar colección (solo puede el propio dueño)
  */
 async function handleDeleteCollection() {
   if (!confirm('¿Estás seguro de que quieres eliminar esta colección? Esta acción no se puede deshacer.')) {
@@ -247,6 +250,33 @@ async function handleDeleteCollection() {
   } catch (err) {
     console.error('Error deleting collection:', err)
     alert('Error al eliminar la colección')
+  }
+}
+
+/**
+ * Maneja la exportación de la colección a Markdown
+ */
+function handleExportCollection() {
+  if (!currentCollection.value || !items.value) {
+    console.warn('[Export] No hay colección o items para exportar')
+    return
+  }
+  
+  // Preparar datos en formato esperado por el composable
+  const collectionData = {
+    ...currentCollection.value,
+    // Asegurar que user_profiles esté disponible para el markdown
+    user_profiles: currentCollection.value.user_profiles
+  }
+  
+  // Ejecutar exportación
+  const success = exportCollectionToMd(collectionData, items.value)
+  
+  // Feedback visual opcional (en el futuro sustituir por toast)
+  if (success) {
+    console.log('✓ Colección exportada correctamente')
+  } else {
+    alert('No se pudo exportar la colección. Por favor, inténtalo de nuevo.')
   }
 }
 </script>
@@ -381,6 +411,8 @@ async function handleDeleteCollection() {
 
             <!-- Acciones para el dueño -->
             <div v-if="isOwner" class="owner-actions">
+              
+              <!-- Enlace a edición de colección -->
               <router-link
                 :to="`/my-collections/${currentCollection.id}/edit`"
                 class="action-button action-button-secondary"
@@ -391,6 +423,8 @@ async function handleDeleteCollection() {
                 </svg>
                 Editar colección
               </router-link>
+              
+              <!-- Botón de eliminar colección -->
               <button
                 class="action-button action-button-danger"
                 @click="handleDeleteCollection"
@@ -400,6 +434,21 @@ async function handleDeleteCollection() {
                   <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
                 </svg>
                 Eliminar colección
+              </button>
+              
+              <!-- Botón de exportar a Markdown -->
+              <button
+                class="action-button action-button-secondary"
+                @click="handleExportCollection"
+                type="button"
+                title="Descargar colección como archivo Markdown"
+              >
+                <svg class="action-icon" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2"/>
+                  <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2"/>
+                  <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Exportar a Markdown
               </button>
             </div>
           </div>

@@ -1,6 +1,5 @@
 // ============================================
 // COMPOSABLE: useCommunity.js
-// ============================================
 // Gestión de interacciones sociales: likes, comentarios, follows y notificaciones
 
 import { ref } from 'vue'
@@ -54,14 +53,14 @@ export function useCommunity() {
       // 2. Verificar si el usuario actual dio like
       const { data: authData } = await supabase.auth.getUser()
       if (authData?.user) {
-        const { data: userLike } = await supabase
+        const { data: userLikes } = await supabase
           .from('likes')
           .select('id')
           .eq('collection_id', collectionId)
           .eq('user_id', authData.user.id)
-          .single()
+          .limit(1)
 
-        hasLiked.value = !!userLike
+        hasLiked.value = Array.isArray(userLikes) && userLikes.length > 0
       }
 
       return { success: true }
@@ -83,12 +82,16 @@ export function useCommunity() {
       error.value = null
 
       // Verificar si ya existe el like
-      const { data: existingLike } = await supabase
+      const { data: existingLikes } = await supabase
         .from('likes')
         .select('id')
         .eq('collection_id', collectionId)
         .eq('user_id', userId)
-        .maybeSingle()
+        .limit(1)
+
+      const existingLike = Array.isArray(existingLikes) && existingLikes.length > 0 
+        ? existingLikes[0] 
+        : null
 
       if (existingLike) {
         // Quitar like (DELETE)
@@ -298,14 +301,14 @@ export function useCommunity() {
       // 3. Verificar si el usuario actual sigue a este perfil
       const { data: authData } = await supabase.auth.getUser()
       if (authData?.user) {
-        const { data: followData } = await supabase
+        const { data: followRecords } = await supabase
           .from('follows')
           .select('id')
           .eq('follower_id', authData.user.id)
           .eq('following_id', targetUserId)
-          .single()
+          .limit(1)
 
-        isFollowing.value = !!followData
+        isFollowing.value = Array.isArray(followRecords) && followRecords.length > 0
       }
 
       return { success: true }
@@ -327,12 +330,16 @@ export function useCommunity() {
       error.value = null
 
       // Verificar estado actual real en la BD
-      const { data: existingFollow } = await supabase
+      const { data: existingFollows } = await supabase
         .from('follows')
         .select('id')
         .eq('follower_id', currentUserId)
         .eq('following_id', targetUserId)
-        .maybeSingle()
+        .limit(1)
+
+      const existingFollow = Array.isArray(existingFollows) && existingFollows.length > 0 
+        ? existingFollows[0] 
+        : null
 
       const actuallyFollowing = !!existingFollow
 

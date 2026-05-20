@@ -1113,3 +1113,19 @@ statusLoaded.value = true  // Ahora los botones reciben estado real
 - Corregir `getSession()` en lugar de `getUser()`
 - Probar flujo completo (like, follow, recargar)
 - Commit: `Fix: botones like/follow muestran estado real al cargar`
+
+---
+
+## [2026-05-20] FASE 5: FEATURES EXTRA - SESIÓN 1
+
+### Completado
+- [x] Footer responsive con enlaces legales y atribución
+- [x] Sistema de temas claro/oscuro con persistencia en localStorage
+- [x] Historial de búsquedas recientes con dropdown teleportado
+- [x] Botón de descubrimiento aleatorio con reintentos y atajo de teclado 'R'
+
+### Pruebas Realizadas
+- [x] Toggle de tema persiste al recargar
+- [x] Historial guarda/elimina términos correctamente
+- [x] Descubrimiento aleatorio navega a obra válida sin errores
+

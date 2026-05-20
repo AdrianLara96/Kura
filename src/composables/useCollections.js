@@ -1,3 +1,5 @@
+// kura/src/composables/useCollections.js
+
 import { ref, computed } from 'vue'
 import { supabase } from '@/supabase/client'
 import { useAuth } from './useAuth'
