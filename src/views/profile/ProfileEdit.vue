@@ -1,4 +1,7 @@
+<!-- src/views/profile/ProfileEdit.vue -->
+
 <template>
+
   <div class="profile-edit-view">
 
     <main class="profile-container container">
@@ -13,6 +16,46 @@
           Cancelar
         </router-link>
       </header>
+
+      <!-- Indicador de Progreso de Perfil -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <span class="progress-title">Completitud del perfil</span>
+          <span class="progress-percentage" :aria-valuenow="profileProgress" aria-valuemin="0" aria-valuemax="100" role="progressbar">
+            {{ profileProgress }}%
+          </span>
+        </div>
+        
+        <!-- Barra de progreso -->
+        <div class="progress-bar-track">
+          <div 
+            class="progress-bar-fill" 
+            :style="{ width: `${profileProgress}%` }"
+            :class="{ 'is-complete': profileProgress === 100 }"
+          ></div>
+        </div>
+        
+        <!-- Mensaje contextual -->
+        <p class="progress-message">{{ progressMessage }}</p>
+        
+        <!-- Lista de criterios -->
+        <ul class="progress-criteria">
+          <li 
+            v-for="item in progressItems" 
+            :key="item.key"
+            class="progress-criterion"
+            :class="{ complete: item.isComplete }"
+          >
+            <svg v-if="item.isComplete" class="criterion-icon complete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <svg v-else class="criterion-icon pending" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+            <span class="criterion-label">{{ item.label }}</span>
+          </li>
+        </ul>
+      </div>
 
       <div class="profile-layout">
         
@@ -168,7 +211,7 @@
             />
           </div>
 
-          <!-- Visibilidad Checkbox (Estilizado) -->
+          <!-- Visibilidad Checkbox -->
           <div class="form-group checkbox-group">
             <label class="toggle-switch">
               <input type="checkbox" v-model="form.is_public" />
@@ -246,6 +289,61 @@ const showAvatarOverlay = ref(false)
 const defaultAvatarUrl = computed(() => 
   getDefaultAvatar(profile.value?.display_name || form.value.display_name)
 )
+
+// ============================================
+// INDICADOR DE PROGRESO DE PERFIL
+// ============================================
+
+/**
+ * Criterios de completitud del perfil (cada uno suma 20%)
+ */
+const profileCompletionCriteria = [
+  { key: 'avatar_url', label: 'Foto de perfil', getter: () => profile.value?.avatar_url || avatarPreview.value },
+  { key: 'display_name', label: 'Nombre visible', getter: () => form.value.display_name?.trim() },
+  { key: 'bio', label: 'Biografía', getter: () => form.value.bio?.trim() },
+  { key: 'location', label: 'Ubicación', getter: () => form.value.location?.trim() },
+  { key: 'website_url', label: 'Sitio web', getter: () => form.value.website_url?.trim() }
+]
+
+/**
+ * Calcula el porcentaje de completitud del perfil (0-100)
+ */
+const profileProgress = computed(() => {
+  const completed = profileCompletionCriteria.filter(criteria => {
+    const value = criteria.getter()
+    return value && value !== '' && value !== null
+  }).length
+  
+  return Math.round((completed / profileCompletionCriteria.length) * 100)
+})
+
+/**
+ * Mensaje contextual según el progreso
+ */
+const progressMessage = computed(() => {
+  const progress = profileProgress.value
+  
+  if (progress === 0) return 'Comienza completando tu perfil'
+  if (progress < 40) return '¡Bien! Sigue añadiendo información'
+  if (progress < 80) return 'Casi listo, ¡solo un poco más!'
+  if (progress < 100) return '¡Casi perfecto! Completa el último detalle'
+  return '¡Perfil completo! 🎉'
+})
+
+/**
+ * Lista de items con su estado para mostrar en la UI
+ */
+const progressItems = computed(() => {
+  return profileCompletionCriteria.map(criteria => {
+    const value = criteria.getter()
+    const isComplete = value && value !== '' && value !== null
+    return {
+      key: criteria.key,
+      label: criteria.label,
+      isComplete
+    }
+  })
+})
 
 onMounted(async () => {
   if (!user.value) {
@@ -810,6 +908,111 @@ const handleSubmit = async () => {
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* ============================================
+   INDICADOR DE PROGRESO DE PERFIL
+   ============================================ */
+
+.progress-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.progress-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.progress-percentage {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--kura-bright-teal);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--kura-teal), var(--kura-bright-teal));
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal) ease;
+}
+
+.progress-bar-fill.is-complete {
+  background: linear-gradient(90deg, var(--kura-bright-teal), var(--success));
+}
+
+.progress-message {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 var(--spacing-md) 0;
+  font-style: italic;
+}
+
+.progress-criteria {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xs) var(--spacing-sm);
+}
+
+@media (max-width: 480px) {
+  .progress-criteria {
+    grid-template-columns: 1fr;
+  }
+}
+
+.progress-criterion {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.progress-criterion.complete {
+  color: var(--text-secondary);
+}
+
+.criterion-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.criterion-icon.complete {
+  color: var(--success);
+}
+
+.criterion-icon.pending {
+  color: var(--border-default);
+}
+
+.criterion-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {

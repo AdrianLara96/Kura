@@ -361,7 +361,6 @@ De momento, ninguna.
 | Documentación Supabase | https://supabase.com/docs    |
 | The Met API            | https://metmuseum.github.io/ |
 
-
 ---
 
 # Bitácora de Desarrollo - Kura
@@ -803,12 +802,13 @@ Registro de todos los pasos, decisiones y cambios del proyecto.
 
 ## Estado del Proyecto
 
-| Fase                | Estado     | Fecha Completado |
-| ------------------- | ---------- | ---------------- |
-| Fase 1: Foundation  | Completada | 12/03/2026       |
-| Fase 2: Exploración | Completada | 14/03/2026       |
-| Fase 3: Colecciones | Completada | 18/03/2026       |
-| Fase 4: Comunidad   | Completada | 21/03/2026       |
+| Fase                   | Estado     | Fecha Completado |
+| ---------------------- | ---------- | ---------------- |
+| Fase 1: Foundation     | Completada | 12/03/2026       |
+| Fase 2: Exploración    | Completada | 14/03/2026       |
+| Fase 3: Colecciones    | Completada | 18/03/2026       |
+| Fase 4: Comunidad      | Completada | 21/03/2026       |
+| Fase 5: Features Extra | Completada | 20/05/2026       |
 
 ---
 
@@ -1052,19 +1052,21 @@ Los botones se renderizaban con valores por defecto (`initialLiked=false`, `init
 
 1. **Flag `statusLoaded` en `CollectionDetail.vue`**:
 
-``` javascript
-const statusLoaded = ref(false)  // Controla cuándo renderizar botones
+```javascript
+const statusLoaded = ref(false); // Controla cuándo renderizar botones
 ```
 
 2. **Activar flag después de los fetch**:
-``` javascript
+
+```javascript
 await fetchLikeStatus(...)
 await fetchFollowStatus(...)
 statusLoaded.value = true  // Ahora los botones reciben estado real
 ```
 
 3. **Renderizado condicional en template**:
-``` vue
+
+```vue
 <LikeButton v-if="statusLoaded" ... />
 <FollowButton v-if="... && statusLoaded" ... />
 ```
@@ -1084,9 +1086,9 @@ statusLoaded.value = true  // Ahora los botones reciben estado real
 
 ### Archivos modificados
 
-| Archivo                | Cambios                                                           |
-| ---------------------- | ----------------------------------------------------------------- |
-| `CollectionDetail.vue` | +statusLoaded flag, +v-if condicional, fix getSession()           |
+| Archivo                | Cambios                                                 |
+| ---------------------- | ------------------------------------------------------- |
+| `CollectionDetail.vue` | +statusLoaded flag, +v-if condicional, fix getSession() |
 
 ---
 
@@ -1116,16 +1118,66 @@ statusLoaded.value = true  // Ahora los botones reciben estado real
 
 ---
 
-## [2026-05-20] FASE 5: FEATURES EXTRA - SESIÓN 1
+## FASE 5: FEATURES EXTRA - COMPLETADA
 
-### Completado
-- [x] Footer responsive con enlaces legales y atribución
-- [x] Sistema de temas claro/oscuro con persistencia en localStorage
-- [x] Historial de búsquedas recientes con dropdown teleportado
-- [x] Botón de descubrimiento aleatorio con reintentos y atajo de teclado 'R'
+### Features Implementadas
 
-### Pruebas Realizadas
-- [x] Toggle de tema persiste al recargar
-- [x] Historial guarda/elimina términos correctamente
-- [x] Descubrimiento aleatorio navega a obra válida sin errores
+| Feature                      | Descripción Técnica                                                                                     | Archivos Principales                                         |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Footer responsive            | Componente global con enlaces legales, atribución a The Met API y diseño adaptable a móvil              | `App.vue`, `components/common/Footer.vue`                    |
+| Temas claro/oscuro           | Gestión de preferencia en localStorage, detección de preferencia del SO, variables CSS semánticas       | `main.css`, `composables/useTheme.js`, `ThemeToggle.vue`     |
+| Historial búsquedas recientes| Persistencia en localStorage, dropdown con Teleport, debounce en input                                  | `composables/useSearchHistory.js`, `ExploreView.vue`         |
+| Descubrimiento aleatorio     | Generación de objectID aleatorio con reintentos exponenciales, filtrado de obras, atajo de teclado 'R'  | `museumApi.js`, `useArtworks.js`, `ExploreView.vue`          |
+| Exportación a Markdown       | Generación de archivo .md con encoding UTF-8, slugificación de títulos, descarga vía Blob API           | `composables/useCollectionExport.js`, `CollectionDetail.vue` |
+| Indicador progreso de perfil | Cálculo reactivo frontend basado en 5 criterios, barra animada con gradiente, feedback contextual       | `ProfileEdit.vue`                                            |
 
+### Soluciones Técnicas Clave
+
+#### 1. Dropdown de historial sobre elementos superpuestos
+
+**Implementación:** Uso de `<Teleport to="body">` para renderizar el dropdown fuera de la jerarquía DOM normal, combinado con posicionamiento `fixed` calculado mediante `getBoundingClientRect()`.
+**Resultado:** El dropdown de historial siempre se muestra por encima de tarjetas, filtros y otros elementos, independientemente de sus stacking contexts.
+
+#### 2. Consultas Supabase sin errores 406
+
+**Implementación:** Sustitución de `.single()` y `.maybeSingle()` por `.limit(1)` en consultas de verificación de existencia (likes, follows), con verificación manual del array resultante.
+**Código patrón:**
+
+```javascript
+const { data } = await supabase
+  .from("likes")
+  .select("id")
+  .eq("collection_id", id)
+  .eq("user_id", userId)
+  .limit(1);
+const exists = Array.isArray(data) && data.length > 0;
+```
+
+**Resultado:** Consultas estables sin errores de parsing de URL, compatibles con filtros múltiples.
+
+### 3. Cálculo reactivo de progreso de perfil
+
+**Implementación:** Array de criterios con funciones getter evaluadas en tiempo real sobre form.value y avatarPreview, computando porcentaje sin esperar guardado en backend.
+**Resultado:** Feedback inmediato al usuario mientras edita, sin llamadas adicionales a la API.
+
+### 4. Exportación con encoding UTF-8 garantizado
+
+**Implementación:** Creación de Blob con type: 'text/markdown;charset=utf-8' y descarga mediante enlace temporal con URL.createObjectURL().
+**Resultado:** Archivos .md con caracteres especiales (ñ, á, é) renderizados correctamente en cualquier editor.
+
+## Pruebas de Validación
+
+- Toggle de tema persiste al recargar y respeta preferencia del sistema operativo
+- Historial de búsquedas guarda, elimina y permite reutilizar términos sin duplicados
+- Descubrimiento aleatorio navega a obra válida tras máximo 3 intentos de reintentos
+- Exportación genera archivo .md descargable con estructura válida y encoding UTF-8
+- Indicador de progreso se actualiza reactivamente al modificar cualquier campo del perfil
+- Console limpia en producción: cero errores rojos, cero warnings de Vue Router
+- Build de producción exitoso: npm run build sin errores de compilación
+
+## Decisiones de Arquitectura Documentadas
+
+1. **Composables aislados por feature:** Cada funcionalidad nueva (export, search history, theme) se implementa en un composable independiente, facilitando testing y reutilización.
+2. **Teleport para overlays:** Patrón estándar para dropdowns, modales y tooltips que deben escapar de contenedores con overflow o z-index limitados.
+3. **Frontend-first para cálculos UI:** El progreso de perfil y el historial de búsquedas se calculan en cliente para respuesta inmediata, sincronizando con backend solo cuando es necesario (guardado de perfil, persistencia de historial).
+4. **Validación de datos en origen:** La exportación a Markdown valida que collection.title exista antes de generar el archivo, evitando errores en tiempo de ejecución.

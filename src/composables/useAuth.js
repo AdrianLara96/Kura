@@ -1,3 +1,4 @@
+// ./src/composables/useAuth.js
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase/client'

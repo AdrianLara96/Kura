@@ -93,6 +93,15 @@ src/
   - **Notificaciones:** Bandeja de notificaciones con contador de no leídas y actualizaciones en tiempo real.
 - **Contador de Vistas:** Tracking automático de visualizaciones por colección.
 
+### 4. Experiencia de Usuario Avanzada
+
+- **Tema Claro/Oscuro:** Alternancia de tema con persistencia en localStorage y detección automática de preferencia del sistema operativo. Implementado mediante variables CSS semánticas y composable `useTheme`.
+- **Historial de Búsquedas:** Registro de los últimos 10 términos buscados, con dropdown interactivo que aparece al enfocar el input. Persistencia en localStorage y eliminación individual o masiva.
+- **Descubrimiento Aleatorio:** Botón "🎲 Descubrir" que navega a una obra aleatoria de The Met, con reintentos automáticos para manejar IDs inexistentes y atajo de teclado `R`.
+- **Exportación a Markdown:** Descarga de colecciones completas como archivo `.md` con estructura legible, enlaces internos/externos y encoding UTF-8 para soporte de caracteres especiales.
+- **Indicador de Progreso de Perfil:** Barra visual que muestra el porcentaje de completitud del perfil (5 criterios), actualizada reactivamente mientras el usuario edita sus datos.
+- **Footer Global:** Componente persistente con enlaces legales, atribución a The Met API y diseño responsive adaptable a móvil.
+
 ---
 
 ## Modelo de Datos
@@ -164,12 +173,13 @@ La base de datos relacional en PostgreSQL (Supabase) se estructura principalment
 
 El proyecto se ha ejecutado siguiendo una metodología iterativa dividida en fases claras:
 
-| Fase               | Estado     | Objetivo Principal                                                                                                |
-| :----------------- | :--------- | :---------------------------------------------------------------------------------------------------------------- |
-| **1. Foundation**  | Completado | Autenticación, perfiles de usuario, integración básica con The Met y esquema de base de datos.                    |
-| **2. Exploración** | Completado | Motor de búsqueda, filtros avanzados, vista de detalle enriquecida, skeleton loaders y manejo robusto de errores. |
-| **3. Colecciones** | Completado | CRUD de colecciones, relación obras-colecciones, galerías públicas, sincronización de datos y funciones RPC.      |
-| **4. Comunidad**   | Completado | Sistema de likes, comentarios, seguimiento de usuarios y notificaciones en tiempo real.                           |
+| Fase                     | Estado     | Objetivo Principal                                                                                                |
+| :----------------------- | :--------- | :---------------------------------------------------------------------------------------------------------------- |
+| **1. Foundation**        | Completado | Autenticación, perfiles de usuario, integración básica con The Met y esquema de base de datos.                    |
+| **2. Exploración**       | Completado | Motor de búsqueda, filtros avanzados, vista de detalle enriquecida, skeleton loaders y manejo robusto de errores. |
+| **3. Colecciones**       | Completado | CRUD de colecciones, relación obras-colecciones, galerías públicas, sincronización de datos y funciones RPC.      |
+| **4. Comunidad**         | Completado | Sistema de likes, comentarios, seguimiento de usuarios y notificaciones en tiempo real.                           |
+| **5. Features Extra**    | Completado | Tema claro/oscuro, historial de búsquedas, descubrimiento aleatorio, exportación a Markdown, progreso de perfil.  |
 
 ---
 
@@ -219,17 +229,10 @@ Los datos de las obras de arte pertenecen a The Metropolitan Museum of Art y se 
 ## Estado Actual
 
 **Versión:** MVP 1.0.0  
-**Fases Completadas:** 4/4  
-**Estado:** ✅ MVP Completo + En Producción  
-**Deploy:** [https://kura.vercel.app](https://kura.vercel.app) *(reemplazar con tu URL real)*
-
-Hemos completado el roadmap inicial de 4 fases y el proyecto está listo para:
-- Testing final de UX
-- Deploy a producción (completado en Vercel)
-- Feedback de usuarios beta
-- Iteración con features post-MVP
+**Estado:** MVP Completo
+**Deploy:** [https://kura-art.vercel.app/](https://kura-art.vercel.app/)
 
 > **Última corrección crítica (10/04/2026):** Fix del bug de doble click en botones like/follow mediante flag `statusLoaded` para renderizado condicional.
 
 **Desarrollador Principal:** Adrian Lara  
-**Fecha de última actualización:** 10 de abril de 2026
+**Fecha de última actualización:** 20 de Mayo de 2026
